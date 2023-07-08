@@ -31,7 +31,7 @@ export type DesmosData =
   | { type: "color-list"; value: [number, number, number][] }
   | { type: "polygon-list"; value: [number, number][][] };
 
-type TestCase = {
+export type TestCase = {
   // input for this test case
   input: DesmosData[];
 
@@ -64,9 +64,9 @@ type TestCase = {
     maxX: number;
     maxY: number;
 
-    // width in pixels (height scales to match based on graphpaper bounds)
-    // maybe change depending on what's intuitive or what desmos actually supports
+    // image pixel dimensions
     widthInPixels: number;
+    heightInPixels: number;
 
     // if reference and submission differ by under this proportion, this test case passes
     invalidSubmissionThreshold: number;

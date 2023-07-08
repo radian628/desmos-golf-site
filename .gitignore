@@ -1,4 +1,5 @@
 dist/*
 tmpdir
 db.json
+*/**/node_modules
 node_modules
