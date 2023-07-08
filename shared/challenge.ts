@@ -24,7 +24,7 @@ type NoListDesmosData =
   | DesmosDataColor
   | DesmosDataPolygon;
 
-type DesmosData =
+export type DesmosData =
   | NoListDesmosData
   | { type: "number-list"; value: number[] }
   | { type: "point-list"; value: [number, number][] }
@@ -43,12 +43,18 @@ type TestCase = {
   expectedOutput?: // get expected output from data
   | {
         type: "data";
-        value: DesmosData[];
+        data: {
+          expectedValue: DesmosData;
+          // if values differ on average by this much or less,
+          // the subission is considered valid
+          threshold: number;
+        }[];
       }
     // get expected output by running this test case on a reference graph
     | {
         type: "reference";
         graph: string;
+        thresholds: number[];
       };
 
   screenshot?: {
@@ -80,6 +86,6 @@ type TestCase = {
   };
 };
 
-type DesmosChallenge = {
+export type DesmosChallenge = {
   testCases: TestCase[];
 };
