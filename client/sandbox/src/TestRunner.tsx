@@ -25,7 +25,7 @@ declare const Desmos: Desmos;
 
 export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
   const [testGraphLink, setTestGraphLink] = createSignal<string>(
-    "https://www.desmos.com/calculator/vfcypm3aka"
+    "https://www.desmos.com/calculator/bjdtsz0sbi"
   );
 
   const [testCalc, setTestCalc] = createSignal<any>();
