@@ -25,7 +25,7 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
     Map<
       string,
       {
-        graph: any;
+        graph: Desmos.Calculator;
         el: HTMLDivElement;
       }
     >
@@ -48,6 +48,16 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
     <div>
       <button
         onClick={async () => {
+          // remove all reference graphs
+          for (const [link, rg] of referenceGraphs().entries()) {
+            rg.graph.destroy();
+            rg.el.parentElement.removeChild(rg.el);
+          }
+          // reset test graph state
+          await initializeGraphState();
+
+          setReferenceGraphs(new Map());
+
           const result = executeChallenge(
             {
               referenceGraphs: async (link: string) => {
@@ -64,6 +74,7 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
 
                 const inner = document.createElement("div");
                 inner.style.height = "400px";
+                inner.style.width = "400px";
                 container.appendChild(inner);
 
                 const calc = Desmos.GraphingCalculator(inner, {});
@@ -105,11 +116,13 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
         style={{ width: "400px" }}
       ></input>
       <div
+        style={{ display: "flex", "flex-wrap": "wrap" }}
         ref={(el) => {
           setTimeout(() => {
             container = el;
             const inner = document.createElement("div");
             inner.style.height = "400px";
+            inner.style.width = "400px";
             el.appendChild(inner);
             console.log(inner);
             const calc = Desmos.GraphingCalculator(inner, {});
