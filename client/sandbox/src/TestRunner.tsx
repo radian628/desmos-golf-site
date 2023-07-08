@@ -108,6 +108,7 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
       >
         Run Test Suite
       </button>
+      <label>Test This Graph: </label>
       <input
         value={testGraphLink()}
         onInput={(e) => {
