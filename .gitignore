@@ -1,0 +1,4 @@
+dist/*
+tmpdir
+db.json
+node_modules
