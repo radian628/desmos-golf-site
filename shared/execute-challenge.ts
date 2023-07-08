@@ -22,7 +22,7 @@ function desmosDataEq(a: RawDesmosData, b: RawDesmosData, threshold: number) {
 function serializeDesmosData(data: DesmosData) {
   switch (data.type) {
     case "number":
-      return data.toString();
+      return data.value.toString();
     case "color":
       return `\\operatorname{rgb}\\left(${data.value[0]},${data.value[1]},${data.value[2]}\\right)`;
     case "point":
@@ -69,15 +69,18 @@ export async function runTestCase(
 
   // set inputs
   for (const item of state.expressions.list) {
-    if (inputIndex > test.input.length) break;
+    if (inputIndex >= test.input.length) break;
 
     if (item.type !== "expression") continue;
     if (!item.latex) continue;
     let stuffAfterEq = item.latex.match(stuffAfterEqRegex);
     if (!stuffAfterEq) continue;
 
+    console.log(test, inputIndex);
+
     let newLatex =
       item.latex.replace(stuffAfterEqRegex, "") +
+      "=" +
       serializeDesmosData(test.input[inputIndex]);
 
     await iface.setExpressionLatex(item.id, newLatex);
@@ -103,7 +106,7 @@ export async function runTestCase(
     state.expressions.list.reverse();
     let outputIndex = 0;
     for (const item of state.expressions.list) {
-      if (outputIndex > outputCount) break;
+      if (outputIndex >= outputCount) break;
 
       if (item.type !== "expression") continue;
       if (!item.latex) continue;
@@ -127,6 +130,8 @@ export async function runTestCase(
     });
   }
 
+  console.log("testcase output", testCaseOutput);
+
   return testCaseOutput;
 }
 
@@ -145,8 +150,15 @@ export async function executeTestCase(
     testCaseForReference.screenshot = test.screenshot;
   let referenceTestCaseOutput: TestCaseOutput | undefined;
   if (testCaseForReference.expectedOutput || testCaseForReference.screenshot) {
+    const referenceGraphInterface = await ifaces.referenceGraphs(
+      test.referenceGraphLink
+    );
+    if (!referenceGraphInterface) {
+      console.warn("Test uses references without a reference graph!");
+      return false;
+    }
     referenceTestCaseOutput = await runTestCase(
-      ifaces.referenceGraph,
+      referenceGraphInterface,
       testCaseForReference
     );
   }

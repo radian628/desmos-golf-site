@@ -39,6 +39,9 @@ export type TestCase = {
   // only then does it compare against outputs and takes a screenshot
   useTicker: boolean;
 
+  // required if any outputs are references
+  referenceGraphLink?: string;
+
   // expected expression output from the last N expressions for this test case
   expectedOutput?: // get expected output from data
   | {
@@ -53,7 +56,6 @@ export type TestCase = {
     // get expected output by running this test case on a reference graph
     | {
         type: "reference";
-        graph: string;
         thresholds: number[];
       };
 
@@ -81,7 +83,6 @@ export type TestCase = {
       // to store them explicitly
       | {
           type: "reference";
-          graph: string;
         };
   };
 };

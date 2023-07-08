@@ -24,7 +24,9 @@ export type ChallengeInterface = {
 
 export type ChallengeInterfaces = {
   testGraph: ChallengeInterface;
-  referenceGraph: ChallengeInterface;
+  referenceGraphs: (
+    referenceLink: string
+  ) => Promise<ChallengeInterface | undefined>;
 };
 
 export enum DesmosDataTypes {
@@ -149,6 +151,7 @@ export function calcObjectToChallengeInterface(calc: Calc): ChallengeInterface {
 
     async setExpressionLatex(id: string, latex: string) {
       calc.setExpression({ id, latex });
+      console.log("setexprlatex");
       await waitForOnEvaluatorChangesEvents(calc, 1);
     },
 
@@ -180,6 +183,7 @@ export function calcObjectToChallengeInterface(calc: Calc): ChallengeInterface {
 
     async resetGraph() {
       calc.setState(originalGraphState);
+      console.log("resetgraph");
       await waitForOnEvaluatorChangesEvents(calc, 1);
     },
 
