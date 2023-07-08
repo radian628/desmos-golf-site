@@ -1,4 +1,4 @@
-import type { Component } from "solid-js";
+import { createSignal, type Component } from "solid-js";
 import { TestRunner } from "./TestRunner";
 import { DesmosChallenge } from "../../../shared/challenge";
 
@@ -51,10 +51,23 @@ const SampleTestSuite2: DesmosChallenge = {
 };
 
 const App: Component = () => {
+  const [testSuite, setTestSuite] = createSignal(
+    JSON.stringify(SampleTestSuite2)
+  );
+
   return (
     <>
-      <h1>Hello world!!!!</h1>
-      <TestRunner testSuite={() => SampleTestSuite2}></TestRunner>
+      <h1>Desmos Test Runner</h1>
+      <h2>Test Suite</h2>
+      <textarea
+        onChange={(e) => {
+          setTestSuite(e.target.value);
+        }}
+      >
+        {testSuite()}
+      </textarea>
+      <h2>Test Runner</h2>
+      <TestRunner testSuite={() => JSON.parse(testSuite())}></TestRunner>
     </>
   );
 };

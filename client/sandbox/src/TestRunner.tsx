@@ -14,15 +14,6 @@ async function getGraph(link: string): Promise<{ state: GraphState }> {
   ).json();
 }
 
-type Desmos = {
-  GraphingCalculator: (
-    el: HTMLElement,
-    options: { graphpaper?: boolean }
-  ) => Calc;
-  Calculator: any;
-};
-declare const Desmos: Desmos;
-
 export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
   const [testGraphLink, setTestGraphLink] = createSignal<string>(
     "https://www.desmos.com/calculator/bjdtsz0sbi"
@@ -40,6 +31,10 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
     >
   >(new Map());
 
+  const [testsFailed, setTestsFailed] = createSignal<
+    DesmosChallenge["testCases"]
+  >([]);
+
   const initializeGraphState = async () =>
     testCalc()?.setState?.((await getGraph(testGraphLink())).state);
 
@@ -51,20 +46,6 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
 
   return (
     <div>
-      <div
-        ref={(el) => {
-          setTimeout(() => {
-            container = el;
-            const inner = document.createElement("div");
-            inner.style.height = "400px";
-            el.appendChild(inner);
-            console.log(inner);
-            const calc = Desmos.GraphingCalculator(inner, {});
-            setTestCalc(calc);
-            initializeGraphState();
-          });
-        }}
-      ></div>
       <button
         onClick={async () => {
           const result = executeChallenge(
@@ -109,11 +90,39 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
             props.testSuite()
           );
 
-          console.log("ran tests:", await result);
+          setTestsFailed(
+            (await result).map((idx) => props.testSuite().testCases[idx])
+          );
         }}
       >
         Run Test Suite
       </button>
+      <input
+        value={testGraphLink()}
+        onInput={(e) => {
+          setTestGraphLink(e.target.value);
+        }}
+        style={{ width: "400px" }}
+      ></input>
+      <div
+        ref={(el) => {
+          setTimeout(() => {
+            container = el;
+            const inner = document.createElement("div");
+            inner.style.height = "400px";
+            el.appendChild(inner);
+            console.log(inner);
+            const calc = Desmos.GraphingCalculator(inner, {});
+            setTestCalc(calc);
+            initializeGraphState();
+          });
+        }}
+      ></div>
+      <h2>
+        {testsFailed().length} out of {props.testSuite().testCases.length} Tests
+        Failed:
+      </h2>
+      <code>{JSON.stringify(testsFailed())}</code>
     </div>
   );
 }

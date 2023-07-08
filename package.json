@@ -3,9 +3,8 @@
     "@desmodder/graph-state": "^0.2.3",
     "body-parser": "^1.20.2",
     "puppeteer": "^20.8.0",
-    "zod": "^3.21.4"
-  },
-  "devDependencies": {
+    "zod": "^3.21.4",
     "@types/desmos": "^1.6.0"
-  }
+  },
+  "devDependencies": {}
 }
