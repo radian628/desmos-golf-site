@@ -30,6 +30,21 @@ export async function getGraphScreenshots(
   for (let i = 0; i < 8; i++) {
     await page.evaluate(() => {
       //@ts-ignore
+      window.evaluatorChangesCounter = 0;
+      //@ts-ignore
+      const dispatcherID = Calc.controller.dispatcher.register((e) => {
+        if (e.type === "on-evaluator-changes") {
+          //@ts-ignore
+          window.evaluatorChangesCounter++;
+        }
+
+        //@ts-ignore
+        if (window.evaluatorChangesCounter === 2) {
+          //@ts-ignore
+          Calc.controller.dispatcher.unregister(dispatcherID);
+        }
+      });
+      //@ts-ignore
       Calc.controller.dispatch({
         type: "action-single-step",
         //@ts-ignore
@@ -39,21 +54,29 @@ export async function getGraphScreenshots(
 
     const screenshot = await page.evaluate(() => {
       return new Promise((resolve, reject) => {
-        //@ts-ignore
-        Calc.asyncScreenshot(
-          {
-            width: 512,
-            height: 512,
-            mathBounds: { left: -2, right: 2, top: 2, bottom: -2 },
-          },
-          (screenshot: any) => {
-            resolve(screenshot);
-          }
-        );
+        const interval = setInterval(() => {
+          //@ts-ignore
+          if (window.evaluatorChangesCounter < 2) return;
+          //@ts-ignore
+          Calc.asyncScreenshot(
+            {
+              width: 512,
+              height: 512,
+              mathBounds: { left: -2, right: 2, top: 2, bottom: -2 },
+            },
+            (screenshot: any) => {
+              resolve(screenshot);
+            }
+          );
+
+          clearInterval(interval);
+        });
       });
     });
 
     screenshots.push(imageDataURI.decode(screenshot).dataBuffer as Buffer);
+
+    fs.writeFile(`tmpdir/${i}.png`, screenshots[i]);
   }
 
   browser.close();
@@ -79,8 +102,20 @@ export async function getDiffFromReferenceImages(images: Buffer[]) {
 
     if (refData.length !== imgData.length) return Infinity;
 
-    for (let i = 0; i < refData.length; i++) {
-      diff += Math.abs(refData[i] - imgData[i]);
+    for (let j = 0; j < refData.length; j++) {
+      const localdiff = Math.abs(refData[j] - imgData[j]);
+      diff += localdiff;
+      if (localdiff > 0) {
+        console.log(
+          "bigdiff",
+          Math.floor(j / 4) % 512,
+          Math.floor(j / 4 / 512),
+          diff,
+          refData[j],
+          imgData[j],
+          i
+        );
+      }
       maxdiff += 256;
     }
   }
