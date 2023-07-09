@@ -48,6 +48,7 @@ const iframe = document.createElement("iframe");
 iframe.setAttribute("sandbox", "allow-scripts");
 iframe.setAttribute("origin", window.location.origin);
 iframe.srcdoc = Evalbox;
+iframe.style.display = "none";
 document.body.appendChild(iframe);
 
 export function generateTestSuite(

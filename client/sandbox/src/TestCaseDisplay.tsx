@@ -39,11 +39,13 @@ export function Bitmap(props: { pixels: () => number[]; width: () => number }) {
   );
 }
 
+import "./TestCaseDisplay.css";
+
 export function FailedTestCaseDisplay(props: {
   case: () => FailedTestCaseOutput;
 }) {
   return (
-    <div>
+    <div class="failed-test-case-display">
       <h3>Inputs</h3>
       <For each={props.case().inputs}>
         {(inp) => (
@@ -52,23 +54,29 @@ export function FailedTestCaseDisplay(props: {
           ></StaticMath>
         )}
       </For>
-      <Show when={props.case().screenshot}>
-        <h3>Screenshot Outputs</h3>
-        <h4>Reference</h4>
-        {
-          <Bitmap
-            pixels={() => props.case().screenshot?.reference as number[]}
-            width={() => props.case().screenshot?.width as number}
-          ></Bitmap>
-        }
-        <h4>Your Graph</h4>
-        {
-          <Bitmap
-            pixels={() => props.case().screenshot?.test as number[]}
-            width={() => props.case().screenshot?.width as number}
-          ></Bitmap>
-        }
-      </Show>
+      <h3>Screenshot Outputs</h3>
+      <div class="screenshot-container">
+        <Show when={props.case().screenshot}>
+          <div class="screenshot">
+            <h4>Reference</h4>
+            {
+              <Bitmap
+                pixels={() => props.case().screenshot?.reference as number[]}
+                width={() => props.case().screenshot?.width as number}
+              ></Bitmap>
+            }
+          </div>
+          <div class="screenshot">
+            <h4>Your Graph</h4>
+            {
+              <Bitmap
+                pixels={() => props.case().screenshot?.test as number[]}
+                width={() => props.case().screenshot?.width as number}
+              ></Bitmap>
+            }
+          </div>
+        </Show>
+      </div>
       <Show when={props.case().outputs}>
         <h3>Expression Outputs</h3>
         <table>

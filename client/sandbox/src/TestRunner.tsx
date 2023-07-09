@@ -55,6 +55,15 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
 
   return (
     <div>
+      <label>Test This Graph: </label>
+      <input
+        value={testGraphLink()}
+        onInput={(e) => {
+          setTestGraphLink(e.target.value);
+        }}
+        style={{ width: "400px" }}
+      ></input>
+      <br></br>
       <button
         onClick={async () => {
           // remove all reference graphs
@@ -119,14 +128,6 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
       >
         Run Test Suite
       </button>
-      <label>Test This Graph: </label>
-      <input
-        value={testGraphLink()}
-        onInput={(e) => {
-          setTestGraphLink(e.target.value);
-        }}
-        style={{ width: "400px" }}
-      ></input>
       <div
         class="test-graphs-container"
         ref={(el) => {
