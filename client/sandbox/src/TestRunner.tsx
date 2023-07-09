@@ -1,12 +1,17 @@
-import { createEffect, createSignal } from "solid-js";
+import { For, createEffect, createSignal } from "solid-js";
 import { DesmosChallenge } from "../../../shared/challenge";
-import { executeChallenge } from "../../../shared/execute-challenge";
+import {
+  FailedTestCaseOutput,
+  executeChallenge,
+} from "../../../shared/execute-challenge";
 import { GraphState } from "@desmodder/graph-state";
 import {
   Calc,
   calcObjectToChallengeInterface,
   waitForOnEvaluatorChangesEvents,
 } from "../../../shared/challenge-interface";
+import "./TestRunner.css";
+import { FailedTestCaseDisplay } from "./TestCaseDisplay";
 
 async function getGraph(link: string): Promise<{ state: GraphState }> {
   return await (
@@ -31,9 +36,9 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
     >
   >(new Map());
 
-  const [testsFailed, setTestsFailed] = createSignal<
-    DesmosChallenge["testCases"]
-  >([]);
+  const [testsFailed, setTestsFailed] = createSignal<FailedTestCaseOutput[]>(
+    []
+  );
 
   const initializeGraphState = async () =>
     testCalc()?.setState?.((await getGraph(testGraphLink())).state);
@@ -107,9 +112,9 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
             props.testSuite()
           );
 
-          setTestsFailed(
-            (await result).map((idx) => props.testSuite().testCases[idx])
-          );
+          console.log("test results", await result);
+
+          setTestsFailed(await result);
         }}
       >
         Run Test Suite
@@ -124,7 +129,6 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
       ></input>
       <div
         class="test-graphs-container"
-        style={{ display: "flex", "flex-wrap": "wrap" }}
         ref={(el) => {
           setTimeout(() => {
             container = el;
@@ -142,7 +146,9 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
         {testsFailed().length} out of {props.testSuite().testCases.length} Tests
         Failed:
       </h2>
-      <code>{JSON.stringify(testsFailed())}</code>
+      <For each={testsFailed()}>
+        {(f) => <FailedTestCaseDisplay case={() => f}></FailedTestCaseDisplay>}
+      </For>
     </div>
   );
 }

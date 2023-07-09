@@ -19,7 +19,7 @@ function desmosDataEq(a: RawDesmosData, b: RawDesmosData, threshold: number) {
   return false;
 }
 
-function serializeDesmosData(data: DesmosData): string {
+export function serializeDesmosData(data: DesmosData): string {
   switch (data.type) {
     case "number":
       return data.value.toString();
@@ -53,8 +53,33 @@ function serializeDesmosData(data: DesmosData): string {
   }
 }
 
+export type FailedTestCaseOutput = {
+  inputs: {
+    name: string;
+    value: DesmosData;
+  }[];
+  screenshot?: {
+    test: number[]; //todo maybe change idk
+    reference: number[]; //todo maybe change idk
+    diff: number;
+    width: number;
+  };
+  outputs?: {
+    name: string;
+    test: DesmosData;
+    reference: DesmosData;
+  }[];
+};
+
 type TestCaseOutput = {
-  outputExpressions?: DesmosData[];
+  inputs: {
+    name: string;
+    value: DesmosData;
+  }[];
+  outputExpressions?: {
+    name: string;
+    value: DesmosData;
+  }[];
   outputScreenshot?: number[];
 };
 
@@ -62,6 +87,8 @@ export async function runTestCase(
   iface: ChallengeInterface,
   test: TestCase
 ): Promise<TestCaseOutput> {
+  const tco: TestCaseOutput = { inputs: [] };
+
   await iface.resetGraph();
 
   const state = await iface.getState();
@@ -78,12 +105,18 @@ export async function runTestCase(
 
     console.log(test, inputIndex);
 
+    tco.inputs.push({
+      name: item.latex.replace(stuffAfterEqRegex, ""),
+      value: test.input[inputIndex],
+    });
+
     let newLatex =
       item.latex.replace(stuffAfterEqRegex, "") +
       "=" +
       serializeDesmosData(test.input[inputIndex]);
 
     await iface.setExpressionLatex(item.id, newLatex);
+
     inputIndex++;
   }
 
@@ -92,10 +125,8 @@ export async function runTestCase(
     while (await iface.doTickerStep());
   }
 
-  const testCaseOutput: TestCaseOutput = {};
-
   if (test.expectedOutput) {
-    testCaseOutput.outputExpressions = [];
+    tco.outputExpressions = [];
 
     const outputCount =
       test.expectedOutput.type === "data"
@@ -114,13 +145,16 @@ export async function runTestCase(
       const expressionValue = await iface.getExpressionValue(item.id);
       if (!expressionValue) continue;
 
-      testCaseOutput.outputExpressions.push(expressionValue);
+      tco.outputExpressions.push({
+        value: expressionValue,
+        name: item.latex.replace(stuffAfterEqRegex, ""),
+      });
       outputIndex++;
     }
   }
 
   if (test.screenshot) {
-    testCaseOutput.outputScreenshot = await iface.getScreenshotBitmap({
+    tco.outputScreenshot = await iface.getScreenshotBitmap({
       xmin: test.screenshot.minX,
       xmax: test.screenshot.maxX,
       ymin: test.screenshot.minY,
@@ -130,15 +164,15 @@ export async function runTestCase(
     });
   }
 
-  console.log("testcase output", testCaseOutput);
-
-  return testCaseOutput;
+  return tco;
 }
 
 export async function executeTestCase(
   ifaces: ChallengeInterfaces,
   test: TestCase
-) {
+): Promise<
+  { success: true } | { success: false; output?: FailedTestCaseOutput }
+> {
   // create and run a test case for the reference graph, if applicable
   const testCaseForReference: TestCase = {
     input: test.input,
@@ -155,7 +189,7 @@ export async function executeTestCase(
     );
     if (!referenceGraphInterface) {
       console.warn("Test uses references without a reference graph!");
-      return false;
+      return { success: false };
     }
     referenceTestCaseOutput = await runTestCase(
       referenceGraphInterface,
@@ -184,7 +218,7 @@ export async function executeTestCase(
       type: "data",
       data: referenceTestCaseOutput.outputExpressions.map((rtco, i) => {
         return {
-          expectedValue: rtco,
+          expectedValue: rtco.value,
           threshold: testExpectedOutput.thresholds[i] ?? -1,
         };
       }),
@@ -205,42 +239,63 @@ export async function executeTestCase(
 
   const testCaseOutput = await runTestCase(ifaces.testGraph, test);
 
-  // ensure that output expressions are as expected
-  if (testCaseOutput.outputExpressions && expectedOutput) {
-    if (testCaseOutput.outputExpressions.length != expectedOutput.data.length) {
-      return false;
-    } else {
-      for (let i = 0; i < expectedOutput.data.length; i++) {
-        if (
-          !desmosDataEq(
-            testCaseOutput.outputExpressions[i].value,
-            expectedOutput.data[i].expectedValue.value,
-            expectedOutput.data[i].threshold
-          )
-        )
-          return false;
-      }
-    }
-  }
+  const outputIfFailure: FailedTestCaseOutput = {
+    inputs: testCaseOutput.inputs,
+  };
 
   // ensure that output screenshot is as expected
   if (testCaseOutput.outputScreenshot && expectedScreenshot) {
     if (testCaseOutput.outputScreenshot.length != expectedScreenshot.length)
-      return false;
+      return { success: false };
     let diff = 0;
     for (let i = 0; i < expectedScreenshot.length; i++) {
       diff += Math.abs(
         testCaseOutput.outputScreenshot[i] - expectedScreenshot[i]
       );
     }
-    if (
-      diff / (expectedScreenshot.length * 256) >
-      (test.screenshot?.invalidSubmissionThreshold ?? -1)
-    )
-      return false;
+
+    const normalizedDiff = diff / (expectedScreenshot.length * 256);
+
+    outputIfFailure.screenshot = {
+      reference: expectedScreenshot,
+      test: testCaseOutput.outputScreenshot,
+      diff: normalizedDiff,
+      width: test.screenshot?.widthInPixels as number,
+    };
+
+    if (normalizedDiff > (test.screenshot?.invalidSubmissionThreshold ?? -1))
+      return { success: false, output: outputIfFailure };
   }
 
-  return true;
+  // ensure that output expressions are as expected
+  if (testCaseOutput.outputExpressions && expectedOutput) {
+    outputIfFailure.outputs = [];
+
+    if (testCaseOutput.outputExpressions.length != expectedOutput.data.length) {
+      return { success: false };
+    } else {
+      let failure = false;
+      for (let i = 0; i < expectedOutput.data.length; i++) {
+        outputIfFailure.outputs.push({
+          name: testCaseOutput.outputExpressions[i].name,
+          test: testCaseOutput.outputExpressions[i].value,
+          reference: expectedOutput.data[i].expectedValue,
+        });
+
+        if (
+          !desmosDataEq(
+            testCaseOutput.outputExpressions[i].value.value,
+            expectedOutput.data[i].expectedValue.value,
+            expectedOutput.data[i].threshold
+          )
+        )
+          failure = true;
+      }
+      if (failure) return { success: false, output: outputIfFailure };
+    }
+  }
+
+  return { success: true };
 }
 
 export async function executeChallenge(
@@ -248,12 +303,13 @@ export async function executeChallenge(
   challenge: DesmosChallenge
 ) {
   let testIndex = 0;
-  let testsFailed: number[] = [];
+  let testsFailed: FailedTestCaseOutput[] = [];
   for (const test of challenge.testCases) {
     const passed = await executeTestCase(ifaces, test);
+    console.log("TEST", passed);
 
-    if (!passed) {
-      testsFailed.push(testIndex);
+    if (!passed.success && passed.output) {
+      testsFailed.push(passed.output);
     }
 
     testIndex++;

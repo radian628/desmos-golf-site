@@ -31,8 +31,8 @@ const generateTestCases: <T extends readonly InputType[]>(
         ? {
             minX: settings.screenshot?.rangeX?.[0] ?? -10,
             minY: settings.screenshot?.rangeY?.[0] ?? -10,
-            maxX: settings.screenshot?.rangeX?.[1] ?? -10,
-            maxY: settings.screenshot?.rangeY?.[1] ?? -10,
+            maxX: settings.screenshot?.rangeX?.[1] ?? 10,
+            maxY: settings.screenshot?.rangeY?.[1] ?? 10,
             widthInPixels: settings.screenshot?.resolution?.[0] ?? 512,
             heightInPixels: settings.screenshot?.resolution?.[1] ?? 512,
             invalidSubmissionThreshold: settings.screenshot?.threshold ?? 0.001,
