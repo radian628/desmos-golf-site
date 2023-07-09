@@ -10,6 +10,10 @@ type Message =
   | {
       type: "test";
       args: Parameters<typeof test>;
+    }
+  | {
+      type: "directTest";
+      args: Parameters<typeof directTest>;
     };
 
 const generateTestCases: <T extends readonly InputType[]>(
@@ -44,6 +48,34 @@ const generateTestCases: <T extends readonly InputType[]>(
   return cases;
 };
 
+const generateDirectTestCases: <
+  I extends readonly InputType[],
+  O extends readonly InputType[],
+>(
+  ...args: Parameters<typeof directTest<I, O>>
+) => TestCase[] = (settings) => {
+  const cases: TestCase[] = [];
+  for (const c of settings.testCases) {
+    cases.push({
+      input: c.in.map((e, i) => ({ value: e, type: settings.inputTypes[i] })),
+      useTicker: settings.ticker ?? false,
+      expectedOutput: {
+        type: "data",
+        data: c.out.map((e, i) => ({
+          expectedValue: {
+            // @ts-expect-error
+            value: e.data,
+            type: settings.outputTypes[i],
+          },
+          // @ts-expect-error
+          threshold: e.threshold ?? 0,
+        })),
+      },
+    });
+  }
+  return cases;
+};
+
 const iframe = document.createElement("iframe");
 iframe.setAttribute("sandbox", "allow-scripts");
 iframe.setAttribute("origin", window.location.origin);
@@ -58,7 +90,6 @@ export function generateTestSuite(
     const code = src.toString();
     const transpiledCode = ts.transpileModule(code, {}).outputText;
     const messageHandler = (msg: MessageEvent) => {
-      console.log("got msg!!", msg, src);
       window.removeEventListener("message", messageHandler);
       const data = msg.data as Message[];
       const challenge: DesmosChallenge = { testCases: [] };
@@ -69,9 +100,11 @@ export function generateTestSuite(
             return;
           case "test":
             challenge.testCases.push(...generateTestCases(...msg.args));
+            break;
+          case "directTest":
+            challenge.testCases.push(...generateDirectTestCases(...msg.args));
         }
       }
-      console.log("work you idiot", challenge);
       resolve(challenge);
     };
     window.addEventListener("message", messageHandler);

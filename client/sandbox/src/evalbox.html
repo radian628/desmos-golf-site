@@ -14,8 +14,14 @@
           });
         }
 
+        function directTest(...args) {
+          messages.push({
+            type: "directTest",
+            args,
+          });
+        }
+
         try {
-          console.log("what is this", e.data);
           eval(e.data.code);
           mainWindow.postMessage(messages, event.origin);
         } catch (e) {

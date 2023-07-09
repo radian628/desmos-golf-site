@@ -1,6 +1,16 @@
-import { defineConfig } from "vite";
+import { PluginOption, defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 // import devtools from 'solid-devtools/vite';
+
+const typedocPlugin: () => PluginOption = () => {
+  return {
+    name: "typedoc",
+    resolveID(id: string) {
+      if (id === "virtual:typedoc") {
+      }
+    },
+  };
+};
 
 export default defineConfig({
   plugins: [

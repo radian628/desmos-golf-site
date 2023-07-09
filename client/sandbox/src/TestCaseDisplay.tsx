@@ -39,7 +39,7 @@ export function Bitmap(props: { pixels: () => number[]; width: () => number }) {
   );
 }
 
-import "./TestCaseDisplay.css";
+import "./TestCaseDisplay.less";
 
 export function FailedTestCaseDisplay(props: {
   case: () => FailedTestCaseOutput;
@@ -54,11 +54,11 @@ export function FailedTestCaseDisplay(props: {
           ></StaticMath>
         )}
       </For>
-      <h3>Screenshot Outputs</h3>
-      <div class="screenshot-container">
-        <Show when={props.case().screenshot}>
+      <Show when={props.case().screenshot}>
+        <h3>Screenshot Outputs</h3>
+        <div class="screenshot-container">
           <div class="screenshot">
-            <h4>Reference</h4>
+            <h4>Expected</h4>
             {
               <Bitmap
                 pixels={() => props.case().screenshot?.reference as number[]}
@@ -75,14 +75,37 @@ export function FailedTestCaseDisplay(props: {
               ></Bitmap>
             }
           </div>
-        </Show>
-      </div>
+          <div class="screenshot">
+            <h4>Difference ({(props.case().screenshot?.diff ?? 0) * 100}%)</h4>
+            {
+              <Bitmap
+                pixels={() => {
+                  const test = props.case().screenshot?.test as number[];
+                  const reference = props.case().screenshot
+                    ?.reference as number[];
+
+                  const diff = [];
+
+                  for (let i = 0; i < test.length; i++) {
+                    diff.push(
+                      i % 4 === 3 ? 255 : Math.abs(test[i] - reference[i])
+                    );
+                  }
+
+                  return diff;
+                }}
+                width={() => props.case().screenshot?.width as number}
+              ></Bitmap>
+            }
+          </div>
+        </div>
+      </Show>
       <Show when={props.case().outputs}>
         <h3>Expression Outputs</h3>
         <table>
           <thead>
             <tr>
-              <th>Reference</th>
+              <th>Expected</th>
               <th>Your Graph</th>
             </tr>
           </thead>

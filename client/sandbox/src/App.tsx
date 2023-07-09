@@ -12,6 +12,7 @@ import { TestCasesInput } from "./TestCasesInput";
 import { generateTestSuite } from "./TestSuiteGenerator";
 import { StaticMath } from "./TestCaseDisplay";
 import "./App.css";
+import { delayChangesTo, delayedEffect } from "./DelayedEffect";
 
 const SampleTestSuite1 = {
   testCases: [-10, -8, -6, -4, -2, 1, 2, 4, 6, 8, 10].map((n) => {
@@ -68,7 +69,6 @@ function asyncify<T>(value: () => Promise<T>): Accessor<T | undefined> {
   createEffect(() => {
     value().then((t) => {
       setV(() => t);
-      console.log("testsuite", t);
     });
   });
 
@@ -83,16 +83,12 @@ const App: Component = () => {
     screenshot: {}
   });`);
 
+  const delayedTestCasesSpec = delayChangesTo(() => 1000, testCasesSpec);
+
   const testCases = asyncify(async () => {
-    const testSuitePromise = generateTestSuite(testCasesSpec());
-    console.log("test suite promise", testSuitePromise);
+    const testSuitePromise = generateTestSuite(delayedTestCasesSpec());
+    console.log("Recreated test suite!");
     const testSuite = await testSuitePromise;
-    console.log(
-      "got here test suite!1!!",
-      testSuitePromise,
-      testSuite,
-      testCasesSpec()
-    );
     return testSuite;
   });
 

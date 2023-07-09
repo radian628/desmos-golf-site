@@ -14,7 +14,7 @@ function desmosDataEq(a: RawDesmosData, b: RawDesmosData, threshold: number) {
   }
 
   if (typeof a === "number" && typeof b === "number")
-    return Math.abs(a - b) < threshold;
+    return Math.abs(a - b) <= threshold;
 
   return false;
 }

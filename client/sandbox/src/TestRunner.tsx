@@ -44,10 +44,6 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
     testCalc()?.setState?.((await getGraph(testGraphLink())).state);
 
   createEffect(() => {
-    console.log("test suite", props.testSuite());
-  });
-
-  createEffect(() => {
     initializeGraphState();
   });
 
@@ -120,8 +116,6 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
             },
             props.testSuite()
           );
-
-          console.log("test results", await result);
 
           setTestsFailed(await result);
         }}

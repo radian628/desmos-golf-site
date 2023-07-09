@@ -23,8 +23,8 @@ type InputTypesToInstance<T extends readonly InputType[]> = T extends readonly [
   infer First extends InputType,
   ...infer Rest extends readonly InputType[],
 ]
-  ? [InputInstance[First], ...InputTypesToInstance<Rest>]
-  : [];
+  ? readonly [InputInstance[First], ...InputTypesToInstance<Rest>]
+  : readonly [];
 
 type HasScreenshotOutput = {
   screenshot: {
@@ -56,3 +56,28 @@ declare function test<Inputs extends readonly InputType[]>(
       }
   )
 ): void;
+
+type WithThreshold<T> = {
+  data: T;
+  threshold?: number;
+};
+
+type WithThresholdArray<A extends readonly any[]> = A extends readonly [
+  infer Start,
+  ...infer Rest extends readonly any[],
+]
+  ? [WithThreshold<Start>, ...WithThresholdArray<Rest>]
+  : [];
+
+declare function directTest<
+  Inputs extends readonly InputType[],
+  Outputs extends readonly InputType[],
+>(settings: {
+  ticker?: boolean;
+  inputTypes: Inputs;
+  outputTypes: Outputs;
+  testCases: {
+    in: InputTypesToInstance<Inputs>;
+    out: WithThresholdArray<InputTypesToInstance<Outputs>>;
+  }[];
+}): void;
