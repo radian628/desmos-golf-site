@@ -25,7 +25,7 @@ export type ChallengeInterface = {
 export type ChallengeInterfaces = {
   testGraph: ChallengeInterface;
   referenceGraphs: (
-    referenceLink: string
+    referenceLink: string | undefined
   ) => Promise<ChallengeInterface | undefined>;
 };
 

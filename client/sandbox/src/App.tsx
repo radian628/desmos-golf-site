@@ -1,6 +1,15 @@
-import { createSignal, type Component } from "solid-js";
+import {
+  createSignal,
+  type Component,
+  createEffect,
+  Signal,
+  Accessor,
+  Show,
+} from "solid-js";
 import { TestRunner } from "./TestRunner";
 import { DesmosChallenge } from "../../../shared/challenge";
+import { TestCasesInput } from "./TestCasesInput";
+import { generateTestSuite } from "./TestSuiteGenerator";
 
 const SampleTestSuite1 = {
   testCases: [-10, -8, -6, -4, -2, 1, 2, 4, 6, 8, 10].map((n) => {
@@ -50,24 +59,55 @@ const SampleTestSuite2: DesmosChallenge = {
   }),
 };
 
+function asyncify<T>(value: () => Promise<T>): Accessor<T | undefined> {
+  const sig = createSignal<T | undefined>(undefined);
+  const [v, setV] = sig;
+
+  createEffect(() => {
+    value().then((t) => {
+      setV(() => t);
+      console.log("testsuite", t);
+    });
+  });
+
+  return v;
+}
+
 const App: Component = () => {
-  const [testSuite, setTestSuite] = createSignal(
-    JSON.stringify(SampleTestSuite2)
-  );
+  const [testCasesSpec, setTestCasesSpec] = createSignal(`test({
+    reference: "https://www.desmos.com/calculator/6yampiamhp",
+    inputTypes: ["number"] as const,
+    inputs: [-10, -8, -6, -4, -2, 1, 2, 4, 6, 8, 10].map(e => [e]),
+    screenshot: {}
+  });`);
+
+  const testCases = asyncify(async () => {
+    const testSuitePromise = generateTestSuite(testCasesSpec());
+    console.log("test suite promise", testSuitePromise);
+    const testSuite = await testSuitePromise;
+    console.log(
+      "got here test suite!1!!",
+      testSuitePromise,
+      testSuite,
+      testCasesSpec()
+    );
+    return testSuite;
+  });
 
   return (
     <>
       <h1>Desmos Test Runner</h1>
       <h2>Test Suite</h2>
-      <textarea
-        onChange={(e) => {
-          setTestSuite(e.target.value);
-        }}
-      >
-        {testSuite()}
-      </textarea>
+      <TestCasesInput
+        code={testCasesSpec}
+        setCode={setTestCasesSpec}
+      ></TestCasesInput>
       <h2>Test Runner</h2>
-      <TestRunner testSuite={() => JSON.parse(testSuite())}></TestRunner>
+      <Show when={testCases() !== undefined}>
+        <TestRunner
+          testSuite={testCases as Accessor<DesmosChallenge>}
+        ></TestRunner>
+      </Show>
     </>
   );
 };

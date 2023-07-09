@@ -10,6 +10,7 @@
     "types": ["vite/client", "desmos"],
     "noEmit": true,
     "isolatedModules": true,
-    "allowJs": true
+    "allowJs": true,
+    "strict": true
   }
 }

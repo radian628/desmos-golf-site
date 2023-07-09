@@ -39,6 +39,10 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
     testCalc()?.setState?.((await getGraph(testGraphLink())).state);
 
   createEffect(() => {
+    console.log("test suite", props.testSuite());
+  });
+
+  createEffect(() => {
     initializeGraphState();
   });
 
@@ -51,7 +55,7 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
           // remove all reference graphs
           for (const [link, rg] of referenceGraphs().entries()) {
             rg.graph.destroy();
-            rg.el.parentElement.removeChild(rg.el);
+            rg.el.parentElement?.removeChild(rg.el);
           }
           // reset test graph state
           await initializeGraphState();
@@ -60,7 +64,9 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
 
           const result = executeChallenge(
             {
-              referenceGraphs: async (link: string) => {
+              referenceGraphs: async (link: string | undefined) => {
+                if (!link) return;
+
                 const existingGraph = referenceGraphs().get(link);
 
                 if (existingGraph)
@@ -117,6 +123,7 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
         style={{ width: "400px" }}
       ></input>
       <div
+        class="test-graphs-container"
         style={{ display: "flex", "flex-wrap": "wrap" }}
         ref={(el) => {
           setTimeout(() => {
@@ -125,7 +132,6 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
             inner.style.height = "400px";
             inner.style.width = "400px";
             el.appendChild(inner);
-            console.log(inner);
             const calc = Desmos.GraphingCalculator(inner, {});
             setTestCalc(calc);
             initializeGraphState();

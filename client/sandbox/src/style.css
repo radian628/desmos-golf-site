@@ -1,0 +1,8 @@
+.test-graphs-container {
+  pointer-events: none;
+  display: flex;
+}
+
+.test-graphs-container * {
+  pointer-events: none;
+}

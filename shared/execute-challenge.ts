@@ -19,7 +19,7 @@ function desmosDataEq(a: RawDesmosData, b: RawDesmosData, threshold: number) {
   return false;
 }
 
-function serializeDesmosData(data: DesmosData) {
+function serializeDesmosData(data: DesmosData): string {
   switch (data.type) {
     case "number":
       return data.value.toString();

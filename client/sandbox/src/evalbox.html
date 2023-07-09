@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <script>
+      window.addEventListener("message", function (e) {
+        var mainWindow = e.source;
+
+        let messages = [];
+
+        function test(...args) {
+          messages.push({
+            type: "test",
+            args,
+          });
+        }
+
+        try {
+          console.log("what is this", e.data);
+          eval(e.data.code);
+          mainWindow.postMessage(messages, event.origin);
+        } catch (e) {
+          mainWindow.postMessage(
+            [
+              {
+                type: "error",
+                why: e.toString(),
+              },
+            ],
+            event.origin
+          );
+        }
+      });
+    </script>
+  </head>
+</html>
