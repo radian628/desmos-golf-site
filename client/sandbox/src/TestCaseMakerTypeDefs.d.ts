@@ -1,4 +1,4 @@
-type InputType =
+type DataType =
   | "number"
   | "point"
   | "color"
@@ -19,9 +19,9 @@ type InputInstance = {
   "polygon-list": [number, number][][];
 };
 
-type InputTypesToInstance<T extends readonly InputType[]> = T extends readonly [
-  infer First extends InputType,
-  ...infer Rest extends readonly InputType[],
+type InputTypesToInstance<T extends readonly DataType[]> = T extends readonly [
+  infer First extends DataType,
+  ...infer Rest extends readonly DataType[],
 ]
   ? readonly [InputInstance[First], ...InputTypesToInstance<Rest>]
   : readonly [];
@@ -41,7 +41,7 @@ type HasExpressionOutput = {
   screenshot?: undefined;
 };
 
-declare function test<Inputs extends readonly InputType[]>(
+declare function test<Inputs extends readonly DataType[]>(
   settings: {
     reference: string;
     inputTypes: Inputs;
@@ -70,8 +70,8 @@ type WithThresholdArray<A extends readonly any[]> = A extends readonly [
   : [];
 
 declare function directTest<
-  Inputs extends readonly InputType[],
-  Outputs extends readonly InputType[],
+  Inputs extends readonly DataType[],
+  Outputs extends readonly DataType[],
 >(settings: {
   ticker?: boolean;
   inputTypes: Inputs;

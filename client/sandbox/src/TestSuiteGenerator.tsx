@@ -16,7 +16,7 @@ type Message =
       args: Parameters<typeof directTest>;
     };
 
-const generateTestCases: <T extends readonly InputType[]>(
+const generateTestCases: <T extends readonly DataType[]>(
   ...args: Parameters<typeof test<T>>
 ) => TestCase[] = (settings) => {
   const cases: TestCase[] = [];
@@ -49,8 +49,8 @@ const generateTestCases: <T extends readonly InputType[]>(
 };
 
 const generateDirectTestCases: <
-  I extends readonly InputType[],
-  O extends readonly InputType[],
+  I extends readonly DataType[],
+  O extends readonly DataType[],
 >(
   ...args: Parameters<typeof directTest<I, O>>
 ) => TestCase[] = (settings) => {

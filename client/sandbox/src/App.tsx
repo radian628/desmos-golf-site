@@ -13,6 +13,7 @@ import { generateTestSuite } from "./TestSuiteGenerator";
 import { StaticMath } from "./TestCaseDisplay";
 import "./App.css";
 import { delayChangesTo, delayedEffect } from "./DelayedEffect";
+import { TestCaseMakerDocs } from "./docs/TestCaseMakerDocs";
 
 const SampleTestSuite1 = {
   testCases: [-10, -8, -6, -4, -2, 1, 2, 4, 6, 8, 10].map((n) => {
@@ -94,6 +95,7 @@ const App: Component = () => {
 
   return (
     <>
+      <TestCaseMakerDocs></TestCaseMakerDocs>
       <h1>Desmos Test Runner</h1>
       <h2>Test Suite</h2>
       <TestCasesInput

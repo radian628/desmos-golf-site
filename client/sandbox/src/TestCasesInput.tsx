@@ -34,77 +34,93 @@ function getTypescriptCompilerHost(view: EditorView): ts.CompilerHost {
   };
 }
 
-export function TestCasesInput(props: {
-  code: () => string;
-  setCode: (code: string) => void;
-}) {
+export function TestCasesInput(
+  props: {
+    code: () => string;
+  } & (
+    | {
+        readonly: true;
+      }
+    | {
+        setCode: (code: string) => void;
+        readonly?: boolean;
+      }
+  )
+) {
   return (
     <div
+      style={{ "pointer-events": props.readonly ? "none" : "initial" }}
       ref={(el) => {
         const view = new EditorView({
           state: EditorState.create({
             doc: props.code(),
             extensions: [
+              EditorView.lineWrapping,
+              EditorState.readOnly.of(props.readonly ?? false),
               syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
               keymap.of(defaultKeymap),
               javascript({ typescript: true }),
               EditorView.updateListener.of((view) => {
-                props.setCode(view.state.doc.toString());
+                if (props.readonly !== true)
+                  props.setCode(view.state.doc.toString());
               }),
-              linter(async (view) => {
-                // const host: ts.CompilerHost = getTypescriptCompilerHost(view);
+              props.readonly
+                ? []
+                : linter(async (view) => {
+                    // const host: ts.CompilerHost = getTypescriptCompilerHost(view);
 
-                // const prog = ts.createProgram({
-                //   rootNames: ["index.ts"],
-                //   options: {
-                //     strict: true,
-                //     lib: ["dom", "es2020"],
-                //     target: ts.ScriptTarget.ESNext,
-                //   },
-                //   host,
-                // });
+                    // const prog = ts.createProgram({
+                    //   rootNames: ["index.ts"],
+                    //   options: {
+                    //     strict: true,
+                    //     lib: ["dom", "es2020"],
+                    //     target: ts.ScriptTarget.ESNext,
+                    //   },
+                    //   host,
+                    // });
 
-                const project = await createProject({
-                  useInMemoryFileSystem: true,
-                  compilerOptions: {
-                    target: ts.ScriptTarget.ES5,
-                  },
-                });
+                    const project = await createProject({
+                      useInMemoryFileSystem: true,
+                      compilerOptions: {
+                        target: ts.ScriptTarget.ES5,
+                      },
+                    });
 
-                const testfn = <T,>(t: T) => t;
+                    const testfn = <T,>(t: T) => t;
 
-                const mainFile = project.createSourceFile(
-                  "main.ts",
-                  view.state.doc.toString()
-                );
+                    const mainFile = project.createSourceFile(
+                      "main.ts",
+                      view.state.doc.toString()
+                    );
 
-                const testRunnerTypeDefs = project.createSourceFile(
-                  "testrunner.d.ts",
-                  TestCaseMakerTypeDefs
-                );
+                    if (!props.readonly) {
+                      const testRunnerTypeDefs = project.createSourceFile(
+                        "testrunner.d.ts",
+                        TestCaseMakerTypeDefs
+                      );
+                    }
+                    const program = project.createProgram();
 
-                const program = project.createProgram();
-
-                return (
-                  ts
-                    .getPreEmitDiagnostics(program)
-                    ?.filter((e) => {
-                      return e?.file?.fileName === "/main.ts";
-                    })
-                    ?.map((e) => {
-                      return {
-                        severity: "error",
-                        message: ts.formatDiagnostic(e, {
-                          getCanonicalFileName: (f) => f,
-                          getCurrentDirectory: () => "/",
-                          getNewLine: () => "\n",
-                        }),
-                        from: e.start ?? 0,
-                        to: (e.start ?? 0) + (e.length ?? 0),
-                      } satisfies Diagnostic;
-                    }) ?? []
-                );
-              }),
+                    return (
+                      ts
+                        .getPreEmitDiagnostics(program)
+                        ?.filter((e) => {
+                          return e?.file?.fileName === "/main.ts";
+                        })
+                        ?.map((e) => {
+                          return {
+                            severity: "error",
+                            message: ts.formatDiagnostic(e, {
+                              getCanonicalFileName: (f) => f,
+                              getCurrentDirectory: () => "/",
+                              getNewLine: () => "\n",
+                            }),
+                            from: e.start ?? 0,
+                            to: (e.start ?? 0) + (e.length ?? 0),
+                          } satisfies Diagnostic;
+                        }) ?? []
+                    );
+                  }),
             ],
           }),
           parent: el,
