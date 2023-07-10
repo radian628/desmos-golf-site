@@ -1,40 +1,42 @@
 import express from "express";
 import { getServerConfig } from "./server-config.js";
-import { getdbString } from "./db.js";
 import bodyParser from "body-parser";
 import { apiCallParser } from "../../shared/validation.js";
 import { submitGraph } from "./submit.js";
+import * as trpcExpress from "@trpc/server/adapters/express";
+import { createClientServerAPI } from "./api/client-server-api.js";
+import sqlite3DatabaseAPI from "./db/sqlite-db-io-api.js";
+import * as fs from "node:fs/promises";
+import { dummyValidationAPI } from "./validation/validation-api.js";
+import { exit } from "node:process";
+
+const secret = (
+  await fs.readFile("secret.txt").catch(() => {
+    console.error(
+      "Create a secret.txt file under the server directory so you have a key for database write access!"
+    );
+    exit();
+  })
+).toString();
 
 const config = await getServerConfig();
 
 const app = express();
 
-app.post("/api", bodyParser.json(), (req, res) => {
-  const apiCall = apiCallParser.safeParse(req.body);
-  console.log(apiCall);
+const api = createClientServerAPI(
+  sqlite3DatabaseAPI(),
+  dummyValidationAPI(),
+  secret
+);
 
-  if (!apiCall.success) {
-    res.status(400).end("Bad API call.");
-    return;
-  }
+app.use(express.static("../client/sandbox/dist"));
 
-  const data = apiCall.data;
-
-  if (data.type === "submit") {
-    submitGraph(data);
-    return;
-  }
-});
-
-app.get("/db", async (req, res) => {
-  res.end(await getdbString());
-});
-
-app.get("/", async (req, res) => {
-  res.end(
-    `<!DOCTYPE html><html><head></head><body>text content test!</body></html>`
-  );
-});
+app.use(
+  "/api",
+  trpcExpress.createExpressMiddleware({
+    router: api,
+  })
+);
 
 app.listen(config.port, config.hostname, () => {
   console.log(

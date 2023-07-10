@@ -8,5 +8,11 @@
     "outDir": "dist",
     "moduleResolution": "NodeNext"
   },
-  "include": ["src/*"]
+  "include": [
+    "src/*",
+    "src/db/db-io-api.ts",
+    "src/api/client-server-api.ts",
+    "src/db/sqlite-db-io-api.ts",
+    "src/validation/validation-api.ts"
+  ]
 }

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@trpc/server": "^10.34.0",
     "express": "^4.18.2",
     "image-data-uri": "^2.0.1",
     "jimp": "^0.22.8",
@@ -13,6 +14,7 @@
   "type": "module",
   "scripts": {
     "build": "npx tsc --project ./",
+    "dev": "npx tsc --watch --project ./",
     "start": "node dist/server/src/server.js",
     "make-reference": "npm run build && node dist/server/src/make-reference.js"
   }

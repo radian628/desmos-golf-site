@@ -1,10 +1,14 @@
 {
   "dependencies": {
     "@desmodder/graph-state": "^0.2.3",
+    "@trpc/client": "^10.34.0",
+    "@trpc/server": "^10.34.0",
+    "@types/desmos": "^1.6.0",
     "body-parser": "^1.20.2",
     "puppeteer": "^20.8.0",
-    "zod": "^3.21.4",
-    "@types/desmos": "^1.6.0"
-  },
-  "devDependencies": {}
+    "sequelize": "^6.32.1",
+    "sequelize-typescript": "^2.1.5",
+    "sqlite3": "^5.1.6",
+    "zod": "^3.21.4"
+  }
 }
