@@ -1,12 +1,27 @@
+import { createSignal } from "solid-js";
 import { TestCasesInput } from "../TestCasesInput";
 import "./TestCaseMakerDocs.less";
 
 export function TestCaseMakerDocs() {
+  const [isExpanded, setIsExpanded] = createSignal(false);
+
   return (
-    <div class="test-case-maker-docs">
-      <header>
+    <div
+      classList={{
+        "test-case-maker-docs": true,
+        "open-docs": isExpanded(),
+      }}
+    >
+      <header
+        onClick={(e) => {
+          setIsExpanded(!isExpanded());
+        }}
+      >
         <h1>
-          Docs <span style="font-size: 0.5em">(Hover to Expand)</span>
+          Docs{" "}
+          <span style="font-size: 0.5em">
+            (Click to {isExpanded() ? "Close" : "Expand"})
+          </span>
         </h1>
       </header>
       <h2>Helper Types</h2>

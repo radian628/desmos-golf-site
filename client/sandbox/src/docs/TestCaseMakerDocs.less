@@ -12,7 +12,7 @@
   transition: max-height 0.25s;
   z-index: 1;
 
-  &:hover {
+  &.open-docs {
     max-height: 90vh;
   }
 
@@ -32,5 +32,10 @@
     border-top: none;
     background-color: white;
     margin: -10px;
+
+    &:hover {
+      background-color: #eeeeee;
+      cursor: pointer;
+    }
   }
 }
