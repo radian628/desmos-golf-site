@@ -22,9 +22,17 @@ export default function MainPage(props: {}) {
   return (
     <>
       <header class="main-header">
-        <div style={{ display: "flex" }}>
-          <StaticMath latex={() => Latex}></StaticMath>
-          <img src={DesmosGraph}></img>
+        <div style={{ display: "flex", "flex-direction": "column" }}>
+          <div
+            style={{
+              display: "flex",
+              "justify-content": "center",
+              "align-items": "center",
+            }}
+          >
+            <StaticMath latex={() => Latex}></StaticMath>
+            <img src={DesmosGraph}></img>
+          </div>
           <div>
             <h1>Desmos Code Golf Site</h1>
             <p>

@@ -79,6 +79,7 @@ function asyncify<T>(value: () => Promise<T>): Accessor<T | undefined> {
 const TestRunnerPage = (props: {
   testCasesSpec: () => string;
   setTestCasesSpec: (s: string) => void;
+  name?: () => string;
 }) => {
   const delayedTestCasesSpec = delayChangesTo(() => 1000, props.testCasesSpec);
 
@@ -96,7 +97,6 @@ const TestRunnerPage = (props: {
   return (
     <>
       <TestCaseMakerDocs></TestCaseMakerDocs>
-      <h2>Desmos Test Runner</h2>
       <h3>Test Suite</h3>
       <TestCasesInput
         code={props.testCasesSpec}

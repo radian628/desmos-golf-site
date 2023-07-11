@@ -1,14 +1,13 @@
-import { useParams } from "@solidjs/router";
+import { Route, Routes, useParams } from "@solidjs/router";
 import {
   ChallengeData,
   ChallengeDataWithoutID,
 } from "../../../../server/src/db/db-io-api";
 import TestRunnerPage from "../test-runner/TestRunnerPage";
-import { getChallenge } from "../communication/trpc-setup";
-import { Show, createEffect, createSignal } from "solid-js";
+import { getChallenge, getSubmissions } from "../communication/trpc-setup";
+import { For, Show, createEffect, createSignal } from "solid-js";
 import { AddOrUpdateNewChallengeForm } from "../common/AddOrUpdateNewChallengeForm";
 import { AdminOnly } from "../common/admin";
-import { makeObjPropSetter } from "../common/utils";
 
 export default function ChallengePage() {
   const { challengeID } = useParams();
@@ -22,6 +21,10 @@ export default function ChallengePage() {
     if (!challengeData()) return;
     setChallengeDataCopy(challengeData());
   });
+
+  const [submissions, reloadSubmissions] = getSubmissions(() =>
+    Number(challengeID)
+  );
 
   return (
     <>
@@ -42,10 +45,33 @@ export default function ChallengePage() {
         </AdminOnly>
         <h1>Challenge: {challengeData()?.name ?? "Loading..."}</h1>
         <p>{challengeData()?.desc ?? "Loading..."}</p>
-        <TestRunnerPage
-          testCasesSpec={() => (challengeData() as ChallengeData).testSuite}
-          setTestCasesSpec={() => {}}
-        ></TestRunnerPage>
+        <Route path="/challenge/:id">
+          <Route
+            path="/submissions"
+            component={() => (
+              <div class="submissions-container">
+                <h2>Submissions</h2>
+                <For each={submissions()}>
+                  {(e) => <p>{JSON.stringify(e)}</p>}
+                </For>
+              </div>
+            )}
+          ></Route>
+          <Route
+            path="/submit-your-own"
+            component={() => (
+              <div class="submit-your-own-container">
+                <h2>Submit your Own</h2>
+                <TestRunnerPage
+                  testCasesSpec={() =>
+                    (challengeData() as ChallengeData).testSuite
+                  }
+                  setTestCasesSpec={() => {}}
+                ></TestRunnerPage>
+              </div>
+            )}
+          ></Route>
+        </Route>
       </Show>
     </>
   );

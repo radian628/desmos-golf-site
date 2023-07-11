@@ -24,7 +24,10 @@ render(
       <Routes>
         <Route path="/" component={MainPage}></Route>
         <Route path="/sandbox" component={Sandbox}></Route>
-        <Route path="/challenge/:challengeID" component={ChallengePage}></Route>
+        <Route
+          path="/challenge/:challengeID/*"
+          component={ChallengePage}
+        ></Route>
       </Routes>
     </Router>
   ),

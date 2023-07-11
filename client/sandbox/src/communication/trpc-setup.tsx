@@ -3,6 +3,7 @@ import { createClientServerAPI } from "../../../../server/src/api/client-server-
 import {
   ChallengeData,
   ChallengeDataWithoutID,
+  ChallengeSubmission,
 } from "../../../../server/src/db/db-io-api";
 import { createEffect, createSignal } from "solid-js";
 
@@ -24,6 +25,20 @@ export function getChallenge(id: () => number) {
   });
 
   return challengeData;
+}
+
+export function getSubmissions(cid: () => number) {
+  const [submissions, setSubmissions] = createSignal<ChallengeSubmission[]>([]);
+
+  const loadAll = async () => {
+    setSubmissions(await trpc.submissions.query(cid()));
+  };
+
+  createEffect(() => {
+    loadAll();
+  });
+
+  return [submissions, loadAll] as const;
 }
 
 export function getChallenges() {

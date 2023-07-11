@@ -41,6 +41,7 @@ export function Sandbox() {
           }}
         ></AddOrUpdateNewChallengeForm>
       </AdminOnly>
+      <h2>Desmos Test Runner</h2>
       <TestRunnerPage
         testCasesSpec={() => challengeData().testSuite}
         setTestCasesSpec={(v) =>

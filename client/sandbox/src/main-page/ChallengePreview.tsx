@@ -8,7 +8,7 @@ export function ChallengePreview(props: {
   id: () => number;
 }) {
   return (
-    <A href={`/challenge/${props.id()}`}>
+    <A href={`/challenge/${props.id()}/submissions`}>
       <div class="challenge-preview">
         <h2>{props.challenge().name}</h2>
         <p>{props.challenge().desc}</p>
