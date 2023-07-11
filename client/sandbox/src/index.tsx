@@ -13,6 +13,8 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 
 import { Router, Routes, Route } from "@solidjs/router";
 import MainPage from "./main-page/MainPage";
+import { Sandbox } from "./sandbox/Sandbox";
+import ChallengePage from "./challenge-page/ChallengePage";
 
 const TestRunner = lazy(() => import("./test-runner/TestRunnerPage"));
 
@@ -21,8 +23,8 @@ render(
     <Router>
       <Routes>
         <Route path="/" component={MainPage}></Route>
-        <Route path="/sandbox" component={TestRunner}></Route>
-        <Route path="/challenges/*" component={TestRunner}></Route>
+        <Route path="/sandbox" component={Sandbox}></Route>
+        <Route path="/challenge/:challengeID" component={ChallengePage}></Route>
       </Routes>
     </Router>
   ),

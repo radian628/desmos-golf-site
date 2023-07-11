@@ -17,14 +17,14 @@ export function TestCaseMakerDocs() {
           setIsExpanded(!isExpanded());
         }}
       >
-        <h1>
+        <h2>
           Docs{" "}
           <span style="font-size: 0.5em">
             (Click to {isExpanded() ? "Close" : "Expand"})
           </span>
-        </h1>
+        </h2>
       </header>
-      <h2>Helper Types</h2>
+      <h3>Helper Types</h3>
       <p>List of valid Desmos data types.</p>
       <TestCasesInput
         code={() => `type DataType =
@@ -58,9 +58,9 @@ type MapTypeToData = {
   "polygon-list": [number, number][][];
 };`}
       ></TestCasesInput>
-      <h2>
+      <h3>
         <code>test</code>
-      </h2>
+      </h3>
       <p>
         The function <code>test</code> runs tests on a graph based on a
         reference graph. That is, output from all tests from this graph will be
@@ -108,9 +108,9 @@ type MapTypeToData = {
 }`}
         readonly
       ></TestCasesInput>
-      <h2>
+      <h3>
         <code>directTest</code>
-      </h2>
+      </h3>
       <p>
         To perform tests without a reference graph, use the function{" "}
         <code>directTest</code>.

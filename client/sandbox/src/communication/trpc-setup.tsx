@@ -1,14 +1,37 @@
 import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { createClientServerAPI } from "../../../../server/src/api/client-server-api";
-import { ChallengeData } from "../../../../server/src/db/db-io-api";
+import {
+  ChallengeData,
+  ChallengeDataWithoutID,
+} from "../../../../server/src/db/db-io-api";
 import { createEffect, createSignal } from "solid-js";
+
+export function getChallenge(id: () => number) {
+  const [challengeData, setChallengeData] =
+    createSignal<ChallengeDataWithoutID>();
+
+  createEffect(async () => {
+    const cd = await trpc.challengeData.query(id());
+    if (!cd) {
+      setChallengeData({
+        name: "Deleted Challenge",
+        desc: "This challenge does not exist.",
+        testSuite: "",
+      });
+      return;
+    }
+    setChallengeData(cd);
+  });
+
+  return challengeData;
+}
 
 export function getChallenges() {
   const [numberOfChallengesToLoad, setNumberOfChallengesToLoad] =
     createSignal(0);
 
   const [challengeList, setChallengeList] = createSignal<
-    Map<number, ChallengeData>
+    Map<number, ChallengeDataWithoutID>
   >(new Map());
 
   const [challengeIDList, setChallengeIDList] = createSignal<number[]>([]);
@@ -25,18 +48,19 @@ export function getChallenges() {
       numberOfChallengesToLoad()
     );
 
-    const newlyLoadedChallenges: [number, ChallengeData][] = await Promise.all(
-      challengeIDsToLoad?.map(async (idx) => {
-        const c = (await trpc.challengeData.query(idx)) ?? {
-          name: "Deleted Challenge",
-          desc: "This challenge no longer exists.",
-          testSuite: "",
-        };
-        return [idx, c];
-      }) ?? []
-    );
+    const newlyLoadedChallenges: [number, ChallengeDataWithoutID][] =
+      await Promise.all(
+        challengeIDsToLoad?.map(async (idx) => {
+          const c = (await trpc.challengeData.query(idx)) ?? {
+            name: "Deleted Challenge",
+            desc: "This challenge no longer exists.",
+            testSuite: "",
+          };
+          return [idx, c];
+        }) ?? []
+      );
 
-    const updatedChallengeList = new Map<number, ChallengeData>([
+    const updatedChallengeList = new Map<number, ChallengeDataWithoutID>([
       ...(challengeList()?.entries() ?? []),
       ...newlyLoadedChallenges,
     ]);

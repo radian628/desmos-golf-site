@@ -1,84 +1,109 @@
-import { Sequelize, DataTypes, Model } from "sequelize";
 import {
   ChallengeData,
   ChallengeSubmission,
   DatabaseIOAPI,
 } from "./db-io-api.js";
 
-export default function sqlite3DatabaseAPI(): DatabaseIOAPI {
-  const sequelize = new Sequelize("sqlite:db/db.sqlite3");
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  DataSource,
+  ManyToOne,
+} from "typeorm";
 
-  const Challenge = sequelize.define<Model<ChallengeData, ChallengeData>>(
-    "Challenge",
-    {
-      name: DataTypes.STRING,
-      desc: DataTypes.STRING,
-      testSuite: DataTypes.STRING,
-    }
-  );
+@Entity("Challenge")
+export class Challenge {
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-  const Submission = sequelize.define<
-    Model<ChallengeSubmission, ChallengeSubmission>
-  >("ChallengeSubmission", {
-    challenge: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: Challenge,
-        key: "rowid",
-      },
-    },
-    creator: DataTypes.STRING,
-    graphLink: DataTypes.STRING,
-    graphStateScore: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    textModeScore: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    desc: DataTypes.STRING,
+  @Column()
+  name!: string;
+
+  @Column()
+  desc!: string;
+
+  @Column()
+  testSuite!: string;
+}
+
+@Entity("Submission")
+export class Submission {
+  @PrimaryGeneratedColumn()
+  id!: number;
+
+  @Column()
+  creator!: string;
+
+  @Column()
+  desc!: string;
+
+  @Column()
+  graphLink!: string;
+
+  @Column()
+  graphStateScore?: number;
+
+  @Column()
+  textModeScore?: number;
+
+  @ManyToOne(() => Challenge)
+  challenge!: number;
+}
+
+export default async function sqlite3DatabaseAPI(): Promise<DatabaseIOAPI> {
+  const AppDataSource = new DataSource({
+    type: "sqlite",
+    database: "./db/db.sqlite3",
+    synchronize: true,
+    entities: [Challenge, Submission],
+    logging: ["error", "query", "schema", "info", "log", "migration", "warn"],
   });
 
-  Challenge.sync();
-  Submission.sync();
+  await AppDataSource.initialize();
+
+  console.log(await AppDataSource.getRepository(Challenge).findAndCount());
 
   return {
     async getChallengeData(cid) {
-      const challenge = await Challenge.findByPk(cid);
-      return challenge?.dataValues;
+      return (
+        (await AppDataSource.getRepository(Challenge).findOne({
+          where: {
+            id: cid,
+          },
+        })) ?? undefined
+      );
     },
 
     async getChallengeList() {
       return (
-        (
-          await Challenge.findAll({
-            attributes: ["id"],
-          })
-        )
-          // needed because sequelize has awful typesafety
-          // @ts-expect-error
-          .map((c) => c.dataValues.id as unknown as number)
-      );
+        await AppDataSource.getRepository(Challenge).find({
+          select: {
+            id: true,
+          },
+        })
+      ).map((c) => c.id);
     },
 
     async getSubmissions(cid) {
-      const submissions = await Submission.findAll({
+      return await AppDataSource.getRepository(Submission).find({
         where: {
           challenge: cid,
         },
       });
-      return submissions.map((e) => e.dataValues);
     },
 
     async submitGraph(submission) {
-      const result = await Submission.create(submission);
+      await AppDataSource.getRepository(Submission).create(submission);
       return true;
     },
 
     async createNewChallenge(info) {
-      const challenge = await Challenge.create(info);
-      return true;
+      console.log("createnewchallenge", info);
+      const challenge = await AppDataSource.getRepository(Challenge).insert(
+        info
+      );
+      return challenge.raw;
     },
   };
 }

@@ -24,14 +24,14 @@ const config = await getServerConfig();
 const app = express();
 
 const api = createClientServerAPI(
-  sqlite3DatabaseAPI(),
+  await sqlite3DatabaseAPI(),
   dummyValidationAPI(),
   secret
 );
 
 app.use(express.static("../client/sandbox/dist"));
 
-const indexRoutes = ["/", "/sandbox", "/challenges/*"];
+const indexRoutes = ["/", "/sandbox", "/challenge/*"];
 
 for (const r of indexRoutes) {
   app.get(r, async (req, res) => {

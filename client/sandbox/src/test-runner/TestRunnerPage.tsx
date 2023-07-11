@@ -76,15 +76,11 @@ function asyncify<T>(value: () => Promise<T>): Accessor<T | undefined> {
   return v;
 }
 
-const TestRunnerPage: Component = () => {
-  const [testCasesSpec, setTestCasesSpec] = createSignal(`test({
-    reference: "https://www.desmos.com/calculator/6yampiamhp",
-    inputTypes: ["number"] as const,
-    inputs: [-10, -8, -6, -4, -2, 1, 2, 4, 6, 8, 10].map(e => [e]),
-    screenshot: {}
-  });`);
-
-  const delayedTestCasesSpec = delayChangesTo(() => 1000, testCasesSpec);
+const TestRunnerPage = (props: {
+  testCasesSpec: () => string;
+  setTestCasesSpec: (s: string) => void;
+}) => {
+  const delayedTestCasesSpec = delayChangesTo(() => 1000, props.testCasesSpec);
 
   const testCases = asyncify(async () => {
     const testSuitePromise = generateTestSuite(delayedTestCasesSpec());
@@ -100,13 +96,13 @@ const TestRunnerPage: Component = () => {
   return (
     <>
       <TestCaseMakerDocs></TestCaseMakerDocs>
-      <h1>Desmos Test Runner</h1>
-      <h2>Test Suite</h2>
+      <h2>Desmos Test Runner</h2>
+      <h3>Test Suite</h3>
       <TestCasesInput
-        code={testCasesSpec}
-        setCode={setTestCasesSpec}
+        code={props.testCasesSpec}
+        setCode={props.setTestCasesSpec}
       ></TestCasesInput>
-      <h2>Test Runner</h2>
+      <h3>Test Runner</h3>
       <Show when={testCases() !== undefined}>
         <TestRunner
           testSuite={testCases as Accessor<DesmosChallenge>}

@@ -3,14 +3,24 @@ import * as z from "zod";
 type ChallengeID = number;
 type TestSuite = string;
 export const ChallengeDataParser = z.object({
+  id: z.number(),
   name: z.string(),
   desc: z.string(),
   testSuite: z.string(),
 });
 export type ChallengeData = z.infer<typeof ChallengeDataParser>;
 
+export const ChallengeDataWithoutIDParser = z.object({
+  name: z.string(),
+  desc: z.string(),
+  testSuite: z.string(),
+});
+export type ChallengeDataWithoutID = z.infer<
+  typeof ChallengeDataWithoutIDParser
+>;
+
 export const CreateNewChallengeArgsParser = z.object({
-  challenge: ChallengeDataParser,
+  challenge: ChallengeDataWithoutIDParser,
   secret: z.string(),
 });
 export type CreateNewChallengeArgs = z.infer<
@@ -26,6 +36,7 @@ export const SubmitGraphArgsParser = z.object({
 export type SubmitGraphArgs = z.infer<typeof SubmitGraphArgsParser>;
 
 export type ChallengeSubmission = {
+  id: number;
   creator: string;
   graphLink: string;
   graphStateScore?: number;
@@ -33,11 +44,14 @@ export type ChallengeSubmission = {
   desc: string;
   challenge: number;
 };
+export type ChallengeSubmissionWithoutID = Omit<ChallengeSubmission, "id">;
 
 export type DatabaseIOAPI = {
   getChallengeData: (cid: ChallengeID) => Promise<ChallengeData | undefined>;
-  submitGraph: (info: ChallengeSubmission) => Promise<boolean>;
-  createNewChallenge: (info: ChallengeData) => Promise<boolean>;
+  submitGraph: (info: ChallengeSubmissionWithoutID) => Promise<boolean>;
+  createNewChallenge: (
+    info: ChallengeDataWithoutID
+  ) => Promise<number | undefined>;
   getChallengeList: () => Promise<ChallengeID[]>;
   getSubmissions: (cid: ChallengeID) => Promise<ChallengeSubmission[]>;
 };

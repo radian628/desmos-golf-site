@@ -4,6 +4,7 @@
     "express": "^4.18.2",
     "image-data-uri": "^2.0.1",
     "jimp": "^0.22.8",
+    "typeorm": "^0.3.17",
     "typescript": "^5.1.6",
     "zod": "^3.21.4"
   },

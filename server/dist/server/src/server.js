@@ -12,9 +12,9 @@ const secret = (await fs.readFile("secret.txt").catch(() => {
 })).toString();
 const config = await getServerConfig();
 const app = express();
-const api = createClientServerAPI(sqlite3DatabaseAPI(), dummyValidationAPI(), secret);
+const api = createClientServerAPI(await sqlite3DatabaseAPI(), dummyValidationAPI(), secret);
 app.use(express.static("../client/sandbox/dist"));
-const indexRoutes = ["/", "/sandbox", "/challenges/*"];
+const indexRoutes = ["/", "/sandbox", "/challenge/*"];
 for (const r of indexRoutes) {
     app.get(r, async (req, res) => {
         res.end(await fs.readFile("../client/sandbox/dist/index.html"));

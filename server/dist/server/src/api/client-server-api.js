@@ -34,7 +34,11 @@ export function createClientServerAPI(databaseIOAPI, validationAPI, secret) {
                 testSuite: challenge.testSuite,
             });
             if (passed) {
-                databaseIOAPI.submitGraph(Object.assign(Object.assign({}, input), { graphStateScore: await validationAPI.getGraphStateLength(input.graphLink), textModeScore: await validationAPI.getTextModeLength(input.graphLink) }));
+                databaseIOAPI.submitGraph({
+                    ...input,
+                    graphStateScore: await validationAPI.getGraphStateLength(input.graphLink),
+                    textModeScore: await validationAPI.getTextModeLength(input.graphLink),
+                });
                 return SubmitGraphState.Succeeded;
             }
             return SubmitGraphState.Failed;
