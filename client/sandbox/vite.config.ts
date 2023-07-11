@@ -1,4 +1,4 @@
-import { PluginOption, defineConfig } from "vite";
+import { PluginOption, defineConfig, splitVendorChunkPlugin } from "vite";
 import solidPlugin from "vite-plugin-solid";
 // import devtools from 'solid-devtools/vite';
 import { run } from "vite-plugin-run";
@@ -18,5 +18,5 @@ export default defineConfig({
   build: {
     target: "esnext",
   },
-  base: "./",
+  base: "/",
 });

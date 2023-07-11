@@ -53,11 +53,12 @@ export default function sqlite3DatabaseAPI(): DatabaseIOAPI {
       return (
         (
           await Challenge.findAll({
-            attributes: ["rowid"],
+            attributes: ["id"],
           })
         )
           // needed because sequelize has awful typesafety
-          .map((c) => c.dataValues as unknown as number)
+          // @ts-expect-error
+          .map((c) => c.dataValues.id as unknown as number)
       );
     },
 

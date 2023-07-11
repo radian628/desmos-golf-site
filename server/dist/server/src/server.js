@@ -14,9 +14,16 @@ const config = await getServerConfig();
 const app = express();
 const api = createClientServerAPI(sqlite3DatabaseAPI(), dummyValidationAPI(), secret);
 app.use(express.static("../client/sandbox/dist"));
+const indexRoutes = ["/", "/sandbox", "/challenges/*"];
+for (const r of indexRoutes) {
+    app.get(r, async (req, res) => {
+        res.end(await fs.readFile("../client/sandbox/dist/index.html"));
+    });
+}
 app.use("/api", trpcExpress.createExpressMiddleware({
     router: api,
 }));
 app.listen(config.port, config.hostname, () => {
     console.log(`Running Desmos Golf Server on port ${config.port}, hostname ${config.hostname}`);
+    console.log("cwd", process.cwd());
 });

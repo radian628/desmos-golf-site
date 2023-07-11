@@ -1,0 +1,9 @@
+.test-graphs-container {
+  pointer-events: none !important;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.test-graphs-container * {
+  pointer-events: none !important;
+}

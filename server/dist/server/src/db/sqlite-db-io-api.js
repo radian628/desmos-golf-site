@@ -35,10 +35,11 @@ export default function sqlite3DatabaseAPI() {
         },
         async getChallengeList() {
             return ((await Challenge.findAll({
-                attributes: ["rowid"],
+                attributes: ["id"],
             }))
                 // needed because sequelize has awful typesafety
-                .map((c) => c.dataValues));
+                // @ts-expect-error
+                .map((c) => c.dataValues.id));
         },
         async getSubmissions(cid) {
             const submissions = await Submission.findAll({
