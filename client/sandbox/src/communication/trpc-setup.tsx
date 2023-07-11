@@ -31,7 +31,7 @@ export function getChallenges() {
     createSignal(0);
 
   const [challengeList, setChallengeList] = createSignal<
-    Map<number, ChallengeDataWithoutID>
+    Map<number, ChallengeData>
   >(new Map());
 
   const [challengeIDList, setChallengeIDList] = createSignal<number[]>([]);
@@ -48,19 +48,19 @@ export function getChallenges() {
       numberOfChallengesToLoad()
     );
 
-    const newlyLoadedChallenges: [number, ChallengeDataWithoutID][] =
-      await Promise.all(
-        challengeIDsToLoad?.map(async (idx) => {
-          const c = (await trpc.challengeData.query(idx)) ?? {
-            name: "Deleted Challenge",
-            desc: "This challenge no longer exists.",
-            testSuite: "",
-          };
-          return [idx, c];
-        }) ?? []
-      );
+    const newlyLoadedChallenges: [number, ChallengeData][] = await Promise.all(
+      challengeIDsToLoad?.map(async (idx) => {
+        const c = (await trpc.challengeData.query(idx)) ?? {
+          name: "Deleted Challenge",
+          desc: "This challenge no longer exists.",
+          testSuite: "",
+          id: -1,
+        };
+        return [idx, c];
+      }) ?? []
+    );
 
-    const updatedChallengeList = new Map<number, ChallengeDataWithoutID>([
+    const updatedChallengeList = new Map<number, ChallengeData>([
       ...(challengeList()?.entries() ?? []),
       ...newlyLoadedChallenges,
     ]);
