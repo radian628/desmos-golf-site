@@ -1,7 +1,7 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
 
-import { lazy } from "solid-js";
+import { Show, createSignal, lazy } from "solid-js";
 
 const root = document.getElementById("root");
 
@@ -12,24 +12,38 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 }
 
 import { Router, Routes, Route } from "@solidjs/router";
-import MainPage from "./main-page/MainPage";
+import MainPage, { Logo, PageHeader, SmallLogo } from "./main-page/MainPage";
 import { Sandbox } from "./sandbox/Sandbox";
 import ChallengePage from "./challenge-page/ChallengePage";
+import {
+  BetterRoute,
+  Link,
+  SpecialRoutes,
+  pathname,
+} from "./common/better-router/BetterRoute";
 
 const TestRunner = lazy(() => import("./test-runner/TestRunnerPage"));
 
+const [challengeID, setChallengeID] = createSignal("");
+
 render(
   () => (
-    <Router>
-      <Routes>
-        <Route path="/" component={MainPage}></Route>
-        <Route path="/sandbox" component={Sandbox}></Route>
-        <Route
-          path="/challenge/:challengeID/*"
-          component={ChallengePage}
-        ></Route>
-      </Routes>
-    </Router>
+    <>
+      <Show when={pathname() !== "/"}>
+        <PageHeader></PageHeader>
+      </Show>
+      <main>
+        <BetterRoute path={() => []}>
+          <MainPage></MainPage>
+        </BetterRoute>
+        <BetterRoute path={() => ["sandbox"]}>
+          <Sandbox></Sandbox>
+        </BetterRoute>
+        <BetterRoute path={() => ["challenge", setChallengeID]} allowMore>
+          <ChallengePage challengeID={challengeID}></ChallengePage>
+        </BetterRoute>
+      </main>
+    </>
   ),
   root!
 );

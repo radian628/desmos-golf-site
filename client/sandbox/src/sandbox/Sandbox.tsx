@@ -7,7 +7,6 @@ import {
   ChallengeDataWithoutID,
 } from "../../../../server/src/db/db-io-api";
 import { trpc } from "../communication/trpc-setup";
-import { useNavigate } from "@solidjs/router";
 
 export function Sandbox() {
   const [challengeData, setChallengeData] =
@@ -17,7 +16,7 @@ export function Sandbox() {
       testSuite: "// write some code that generates a test suite here",
     });
 
-  const navigate = useNavigate();
+  const [testGraphLink, setTestGraphLink] = createSignal<string>("");
 
   return (
     <>
@@ -35,14 +34,25 @@ export function Sandbox() {
               secret,
             });
 
-            if (id !== undefined) {
-              navigate(`/challenge/${id}`);
-            }
+            // if (id !== undefined) {
+            //   navigate(`/challenge/${id}`);
+            // }
           }}
         ></AddOrUpdateNewChallengeForm>
       </AdminOnly>
       <h2>Desmos Test Runner</h2>
+      <label>Test this Graph </label>
+      <input
+        value={testGraphLink()}
+        onInput={(e) => {
+          setTestGraphLink(e.target.value);
+        }}
+        placeholder="Put graph link here..."
+        style={{ width: "400px" }}
+      ></input>
       <TestRunnerPage
+        testGraphLink={testGraphLink}
+        setTestGraphLink={setTestGraphLink}
         testCasesSpec={() => challengeData().testSuite}
         setTestCasesSpec={(v) =>
           setChallengeData({

@@ -1,5 +1,6 @@
 body {
   font-family: sans-serif;
+  margin: 0;
 }
 
 .main-header {
@@ -7,7 +8,41 @@ body {
   > * {
     text-align: center;
   }
-  img {
-    width: 200px;
+
+  @media (prefers-reduced-motion: no-preference) {
+    img {
+      animation: to-right;
+      animation-duration: 0.5s;
+    }
+
+    @keyframes to-right {
+      from {
+        transform: translateX(-200px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
   }
+}
+
+.logo {
+  width: 200px;
+}
+
+.small-logo {
+  width: 100px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+main {
+  padding: 10px;
 }

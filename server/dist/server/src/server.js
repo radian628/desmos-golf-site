@@ -17,7 +17,12 @@ app.use(express.static("../client/sandbox/dist"));
 const indexRoutes = ["/", "/sandbox", "/challenge/*"];
 for (const r of indexRoutes) {
     app.get(r, async (req, res) => {
-        res.end(await fs.readFile("../client/sandbox/dist/index.html"));
+        try {
+            res.end(await fs.readFile("../client/sandbox/dist/index.html"));
+        }
+        catch {
+            res.status(404).end("404 not found");
+        }
     });
 }
 app.use("/api", trpcExpress.createExpressMiddleware({

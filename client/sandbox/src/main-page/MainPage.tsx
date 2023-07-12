@@ -5,7 +5,25 @@ import { ChallengePreview } from "./ChallengePreview";
 import { StaticMath } from "../test-runner/TestCaseDisplay";
 import DesmosGraph from "./desmos-graph.png";
 import Latex from "./latex.txt?raw";
-import { A } from "@solidjs/router";
+import { Link } from "../common/better-router/BetterRoute";
+
+export function Logo() {
+  return <img class="logo" src={DesmosGraph}></img>;
+}
+export function SmallLogo() {
+  return <img class="small-logo" src={DesmosGraph}></img>;
+}
+
+export function PageHeader() {
+  return (
+    <header class="page-header">
+      <Link to={() => "/"}>
+        <SmallLogo></SmallLogo>
+      </Link>
+      <h1>Desmos Code Golf Site</h1>
+    </header>
+  );
+}
 
 export default function MainPage(props: {}) {
   const challenges = getChallenges();
@@ -30,8 +48,33 @@ export default function MainPage(props: {}) {
               "align-items": "center",
             }}
           >
-            <StaticMath latex={() => Latex}></StaticMath>
-            <img src={DesmosGraph}></img>
+            <div
+              ref={(el) => {
+                setTimeout(() => {
+                  if (
+                    !matchMedia("(prefers-reduced-motion: no-preference)")
+                      .matches
+                  )
+                    return;
+                  for (const e of el.querySelectorAll("*")) {
+                    if (e instanceof HTMLElement) {
+                      e.style.transform = `translate(${
+                        Math.random() * 150 - 75
+                      }px, ${Math.random() * 150 - 75}px)`;
+                      e.style.opacity = "0";
+                      setTimeout(() => {
+                        e.style.transition = `transform 0.5s, opacity 0.5s`;
+                        e.style.transform = `translate(0px, 0px)`;
+                        e.style.opacity = "1";
+                      }, 20);
+                    }
+                  }
+                });
+              }}
+            >
+              <StaticMath latex={() => Latex}></StaticMath>
+            </div>
+            <Logo></Logo>
           </div>
           <div>
             <h1>Desmos Code Golf Site</h1>
@@ -41,7 +84,8 @@ export default function MainPage(props: {}) {
             </p>
             <p>
               Welcome to the Desmos Code Golf Site! Pick a challenge to try
-              below or make your own in the <A href="/sandbox">Sandbox</A>:
+              below or make your own in the{" "}
+              <Link to={() => "/sandbox"}>Sandbox</Link>:
             </p>
           </div>
         </div>

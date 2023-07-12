@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.1.9",
+    "@codemirror/theme-one-dark": "^6.1.2",
     "@solidjs/router": "^0.8.2",
     "@ts-morph/bootstrap": "^0.20.0",
     "codemirror": "^6.0.1",

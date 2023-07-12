@@ -31,14 +31,14 @@ function getDesmos() {
   });
 }
 
-export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
+export function TestRunner(props: {
+  testSuite: () => DesmosChallenge;
+  testGraphLink: () => string;
+  setTestGraphLink: (l: string) => void;
+}) {
   console.log("current state of desmso", window.Desmos);
 
   const [hasRunTests, setHasRunTests] = createSignal(false);
-
-  const [testGraphLink, setTestGraphLink] = createSignal<string>(
-    "https://www.desmos.com/calculator/bjdtsz0sbi"
-  );
 
   const [testCalc, setTestCalc] = createSignal<any>();
 
@@ -57,7 +57,7 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
   );
 
   const initializeGraphState = async () =>
-    testCalc()?.setState?.((await getGraph(testGraphLink())).state);
+    testCalc()?.setState?.((await getGraph(props.testGraphLink())).state);
 
   createEffect(() => {
     initializeGraphState();
@@ -67,15 +67,6 @@ export function TestRunner(props: { testSuite: () => DesmosChallenge }) {
 
   return (
     <div>
-      <label>Test This Graph: </label>
-      <input
-        value={testGraphLink()}
-        onInput={(e) => {
-          setTestGraphLink(e.target.value);
-        }}
-        style={{ width: "400px" }}
-      ></input>
-      <br></br>
       <button
         onClick={async () => {
           console.log("test suite", props.testSuite());

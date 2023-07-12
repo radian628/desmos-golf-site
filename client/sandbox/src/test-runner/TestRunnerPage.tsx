@@ -14,6 +14,7 @@ import { StaticMath } from "./TestCaseDisplay";
 import "./App.css";
 import { delayChangesTo, delayedEffect } from "./DelayedEffect";
 import { TestCaseMakerDocs } from "../test-runner/docs/TestCaseMakerDocs";
+import { Portal } from "solid-js/web";
 
 const SampleTestSuite1 = {
   testCases: [-10, -8, -6, -4, -2, 1, 2, 4, 6, 8, 10].map((n) => {
@@ -80,6 +81,8 @@ const TestRunnerPage = (props: {
   testCasesSpec: () => string;
   setTestCasesSpec: (s: string) => void;
   name?: () => string;
+  testGraphLink: () => string;
+  setTestGraphLink: (l: string) => void;
 }) => {
   const delayedTestCasesSpec = delayChangesTo(() => 1000, props.testCasesSpec);
 
@@ -96,18 +99,28 @@ const TestRunnerPage = (props: {
 
   return (
     <>
-      <TestCaseMakerDocs></TestCaseMakerDocs>
-      <h3>Test Suite</h3>
-      <TestCasesInput
-        code={props.testCasesSpec}
-        setCode={props.setTestCasesSpec}
-      ></TestCasesInput>
-      <h3>Test Runner</h3>
-      <Show when={testCases() !== undefined}>
-        <TestRunner
-          testSuite={testCases as Accessor<DesmosChallenge>}
-        ></TestRunner>
-      </Show>
+      <Portal>
+        <TestCaseMakerDocs></TestCaseMakerDocs>
+      </Portal>
+      <div style={{ display: "flex", "flex-wrap": "wrap", margin: "10px" }}>
+        <div>
+          <h3>Test Suite</h3>
+          <TestCasesInput
+            code={props.testCasesSpec}
+            setCode={props.setTestCasesSpec}
+          ></TestCasesInput>
+        </div>
+        <div>
+          <h3>Test Runner</h3>
+          <Show when={testCases() !== undefined}>
+            <TestRunner
+              testGraphLink={props.testGraphLink}
+              setTestGraphLink={props.setTestGraphLink}
+              testSuite={testCases as Accessor<DesmosChallenge>}
+            ></TestRunner>
+          </Show>
+        </div>
+      </div>
     </>
   );
 };

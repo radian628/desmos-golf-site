@@ -7,31 +7,21 @@ import {
   syntaxHighlighting,
 } from "@codemirror/language";
 import { Diagnostic, linter } from "@codemirror/lint";
-import * as ts from "typescript";
-import { createProject } from "@ts-morph/bootstrap";
 import TestCaseMakerTypeDefs from "./TestCaseMakerTypeDefs.d.ts?raw";
 import { generateTestSuite } from "./TestSuiteGenerator";
+import { oneDarkHighlightStyle } from "@codemirror/theme-one-dark";
 
-function getTypescriptCompilerHost(view: EditorView): ts.CompilerHost {
-  return {
-    getSourceFile: (fileName, languageVersion, onError) => {
-      return ts.createSourceFile(
-        "index.ts",
-        view.state.doc.toString(),
-        languageVersion
-      );
-    },
-    getDefaultLibFileName: (opts) => "index.ts",
-    writeFile: () => {},
-    getCurrentDirectory: () => "/",
-    getCanonicalFileName: (name) => name,
-    useCaseSensitiveFileNames: () => false,
-    getNewLine: () => "\n",
-    fileExists: () => true,
-    readFile: (filename: string) => {
-      return view.state.doc.toString();
-    },
-  };
+let typescriptModule: typeof import("typescript");
+async function getTypescript() {
+  if (!typescriptModule) typescriptModule = await import("typescript");
+  return typescriptModule;
+}
+
+let tsMorphBootstrapModule: typeof import("@ts-morph/bootstrap");
+async function getTsMorphBootstrap() {
+  if (!tsMorphBootstrapModule)
+    tsMorphBootstrapModule = await import("@ts-morph/bootstrap");
+  return tsMorphBootstrapModule;
 }
 
 export function TestCasesInput(
@@ -57,7 +47,17 @@ export function TestCasesInput(
             extensions: [
               EditorView.lineWrapping,
               EditorState.readOnly.of(props.readonly ?? false),
-              syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+              EditorView.theme({
+                ".cm-content": {
+                  "caret-color": "var(--foreground-color)",
+                },
+              }),
+              syntaxHighlighting(
+                matchMedia("(prefers-color-scheme: dark)").matches
+                  ? oneDarkHighlightStyle
+                  : defaultHighlightStyle,
+                { fallback: true }
+              ),
               keymap.of(defaultKeymap),
               javascript({ typescript: true }),
               EditorView.updateListener.of((view) => {
@@ -67,22 +67,12 @@ export function TestCasesInput(
               props.readonly
                 ? []
                 : linter(async (view) => {
-                    // const host: ts.CompilerHost = getTypescriptCompilerHost(view);
-
-                    // const prog = ts.createProgram({
-                    //   rootNames: ["index.ts"],
-                    //   options: {
-                    //     strict: true,
-                    //     lib: ["dom", "es2020"],
-                    //     target: ts.ScriptTarget.ESNext,
-                    //   },
-                    //   host,
-                    // });
-
-                    const project = await createProject({
+                    const project = await (
+                      await getTsMorphBootstrap()
+                    ).createProject({
                       useInMemoryFileSystem: true,
                       compilerOptions: {
-                        target: ts.ScriptTarget.ES5,
+                        target: (await getTypescript()).ScriptTarget.ES5,
                       },
                     });
 
@@ -101,20 +91,23 @@ export function TestCasesInput(
                     }
                     const program = project.createProgram();
 
-                    return (
-                      ts
+                    return Promise.all(
+                      (await getTypescript())
                         .getPreEmitDiagnostics(program)
                         ?.filter((e) => {
                           return e?.file?.fileName === "/main.ts";
                         })
-                        ?.map((e) => {
+                        ?.map(async (e) => {
                           return {
                             severity: "error",
-                            message: ts.formatDiagnostic(e, {
-                              getCanonicalFileName: (f) => f,
-                              getCurrentDirectory: () => "/",
-                              getNewLine: () => "\n",
-                            }),
+                            message: (await getTypescript()).formatDiagnostic(
+                              e,
+                              {
+                                getCanonicalFileName: (f) => f,
+                                getCurrentDirectory: () => "/",
+                                getNewLine: () => "\n",
+                              }
+                            ),
                             from: e.start ?? 0,
                             to: (e.start ?? 0) + (e.length ?? 0),
                           } satisfies Diagnostic;
