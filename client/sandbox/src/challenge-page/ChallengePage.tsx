@@ -60,7 +60,7 @@ export default function ChallengePage(props: { challengeID: () => string }) {
             <h2>Submissions</h2>
             <Show
               when={submissions().length > 0}
-              fallback={<p>No submissions yet...</p>}
+              fallback={<p>No submissions yet</p>}
             >
               <For each={submissions()}>
                 {(e) => <p>{JSON.stringify(e)}</p>}

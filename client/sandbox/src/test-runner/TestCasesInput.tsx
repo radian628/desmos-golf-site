@@ -1,5 +1,5 @@
 import { EditorView, keymap } from "@codemirror/view";
-import { EditorState } from "@codemirror/state";
+import { EditorState, Compartment } from "@codemirror/state";
 import { defaultKeymap } from "@codemirror/commands";
 import { javascript } from "@codemirror/lang-javascript";
 import {
@@ -10,6 +10,8 @@ import { Diagnostic, linter } from "@codemirror/lint";
 import TestCaseMakerTypeDefs from "./TestCaseMakerTypeDefs.d.ts?raw";
 import { generateTestSuite } from "./TestSuiteGenerator";
 import { oneDarkHighlightStyle } from "@codemirror/theme-one-dark";
+import { colorScheme } from "..";
+import { createEffect } from "solid-js";
 
 let typescriptModule: typeof import("typescript");
 async function getTypescript() {
@@ -41,10 +43,13 @@ export function TestCasesInput(
     <div
       style={{ "pointer-events": props.readonly ? "none" : "initial" }}
       ref={(el) => {
+        const themeConfigCompartment = new Compartment();
+
         const view = new EditorView({
           state: EditorState.create({
             doc: props.code(),
             extensions: [
+              themeConfigCompartment.of([]),
               EditorView.lineWrapping,
               EditorState.readOnly.of(props.readonly ?? false),
               EditorView.theme({
@@ -52,17 +57,15 @@ export function TestCasesInput(
                   "caret-color": "var(--foreground-color)",
                 },
               }),
-              syntaxHighlighting(
-                matchMedia("(prefers-color-scheme: dark)").matches
-                  ? oneDarkHighlightStyle
-                  : defaultHighlightStyle,
-                { fallback: true }
-              ),
               keymap.of(defaultKeymap),
               javascript({ typescript: true }),
               EditorView.updateListener.of((view) => {
-                if (props.readonly !== true)
-                  props.setCode(view.state.doc.toString());
+                const contentsAsString = view.state.doc.toString();
+                if (
+                  props.readonly !== true &&
+                  props.code() !== contentsAsString
+                )
+                  props.setCode(contentsAsString);
               }),
               props.readonly
                 ? []
@@ -117,6 +120,21 @@ export function TestCasesInput(
             ],
           }),
           parent: el,
+        });
+
+        createEffect(() => {
+          const cs = colorScheme();
+
+          view.dispatch({
+            effects: themeConfigCompartment.reconfigure([
+              syntaxHighlighting(
+                cs === "dark" ? oneDarkHighlightStyle : defaultHighlightStyle,
+                { fallback: true }
+              ),
+            ]),
+          });
+
+          //console.log(colorScheme(), "infinite loop!");
         });
       }}
     ></div>

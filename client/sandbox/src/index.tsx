@@ -1,7 +1,7 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
 
-import { Show, createSignal, lazy } from "solid-js";
+import { Show, createEffect, createSignal, lazy } from "solid-js";
 
 const root = document.getElementById("root");
 
@@ -21,10 +21,36 @@ import {
   SpecialRoutes,
   pathname,
 } from "./common/better-router/BetterRoute";
+import { LightDarkToggle } from "./common/LightDarkToggle";
 
 const TestRunner = lazy(() => import("./test-runner/TestRunnerPage"));
 
 const [challengeID, setChallengeID] = createSignal("");
+
+let colorSchemeFromLocalStorage = window.localStorage.getItem("colorScheme");
+
+if (colorSchemeFromLocalStorage === null) {
+  colorSchemeFromLocalStorage = window.matchMedia(
+    "(prefers-color-scheme: dark)"
+  ).matches
+    ? "dark"
+    : "light";
+} else {
+  colorSchemeFromLocalStorage =
+    colorSchemeFromLocalStorage === "light" ? "light" : "dark";
+}
+
+export const [colorScheme, setColorScheme] = createSignal<"light" | "dark">(
+  colorSchemeFromLocalStorage as "light" | "dark"
+);
+
+createEffect(() => {
+  window.localStorage.setItem("colorScheme", colorScheme());
+  document.body.classList.toggle(
+    "dark",
+    colorScheme() === "dark" ? true : false
+  );
+});
 
 render(
   () => (
@@ -43,6 +69,7 @@ render(
           <ChallengePage challengeID={challengeID}></ChallengePage>
         </BetterRoute>
       </main>
+      <LightDarkToggle></LightDarkToggle>
     </>
   ),
   root!

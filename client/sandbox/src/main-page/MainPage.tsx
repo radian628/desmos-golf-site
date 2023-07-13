@@ -1,11 +1,12 @@
 import "./MainPage.less";
 import { getChallenges, trpc } from "../communication/trpc-setup";
-import { For, createEffect, untrack } from "solid-js";
+import { For, Show, createEffect, untrack } from "solid-js";
 import { ChallengePreview } from "./ChallengePreview";
 import { StaticMath } from "../test-runner/TestCaseDisplay";
 import DesmosGraph from "./desmos-graph.png";
 import Latex from "./latex.txt?raw";
 import { Link } from "../common/better-router/BetterRoute";
+import { LightDarkToggle } from "../common/LightDarkToggle";
 
 export function Logo() {
   return <img class="logo" src={DesmosGraph}></img>;
@@ -91,14 +92,19 @@ export default function MainPage(props: {}) {
         </div>
       </header>
       <main>
-        <For each={Array.from(challenges.challengeList().entries())}>
-          {(e) => (
-            <ChallengePreview
-              challenge={() => e[1]}
-              id={() => e[0]}
-            ></ChallengePreview>
-          )}
-        </For>
+        <Show
+          when={Array.from(challenges.challengeList().entries()).length > 0}
+          fallback={<p>Loading...</p>}
+        >
+          <For each={Array.from(challenges.challengeList().entries())}>
+            {(e) => (
+              <ChallengePreview
+                challenge={() => e[1]}
+                id={() => e[0]}
+              ></ChallengePreview>
+            )}
+          </For>
+        </Show>
       </main>
     </>
   );

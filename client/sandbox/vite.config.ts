@@ -2,6 +2,7 @@ import { PluginOption, defineConfig, splitVendorChunkPlugin } from "vite";
 import solidPlugin from "vite-plugin-solid";
 // import devtools from 'solid-devtools/vite';
 import { run } from "vite-plugin-run";
+import * as path from "node:path";
 
 export default defineConfig({
   plugins: [
@@ -17,6 +18,13 @@ export default defineConfig({
   },
   build: {
     target: "esnext",
+    rollupOptions: {
+      output: {
+        sourcemapIgnoreList: (p) => {
+          return path.normalize(p).includes("node_modules");
+        },
+      },
+    },
   },
   base: "/",
 });

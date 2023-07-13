@@ -11,7 +11,7 @@ import { DesmosChallenge } from "../../../../shared/challenge";
 import { TestCasesInput } from "./TestCasesInput";
 import { generateTestSuite } from "./TestSuiteGenerator";
 import { StaticMath } from "./TestCaseDisplay";
-import "./App.css";
+import "./App.less";
 import { delayChangesTo, delayedEffect } from "./DelayedEffect";
 import { TestCaseMakerDocs } from "../test-runner/docs/TestCaseMakerDocs";
 import { Portal } from "solid-js/web";
@@ -89,11 +89,6 @@ const TestRunnerPage = (props: {
   const testCases = asyncify(async () => {
     const testSuitePromise = generateTestSuite(delayedTestCasesSpec());
     const testSuite = await testSuitePromise;
-    console.log(
-      "test suite in testrunnerpage",
-      delayedTestCasesSpec(),
-      testSuite
-    );
     return testSuite;
   });
 

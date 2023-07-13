@@ -13,10 +13,16 @@ import {
 import "./TestRunner.css";
 import { FailedTestCaseDisplay } from "./TestCaseDisplay";
 
-async function getGraph(link: string): Promise<{ state: GraphState }> {
-  return await (
-    await fetch(link, { headers: { Accept: "application/json" } })
-  ).json();
+async function getGraph(
+  link: string
+): Promise<{ state: GraphState } | undefined> {
+  try {
+    return await (
+      await fetch(link, { headers: { Accept: "application/json" } })
+    ).json();
+  } catch {
+    return undefined;
+  }
 }
 
 function getDesmos() {
@@ -57,7 +63,7 @@ export function TestRunner(props: {
   );
 
   const initializeGraphState = async () =>
-    testCalc()?.setState?.((await getGraph(props.testGraphLink())).state);
+    testCalc()?.setState?.((await getGraph(props.testGraphLink()))?.state);
 
   createEffect(() => {
     initializeGraphState();
