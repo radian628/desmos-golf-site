@@ -67,6 +67,7 @@ let ctx = await esbuild.context({
   sourcemap: true,
   format: "esm",
   publicPath: "/",
+  minify: true,
 });
 
 ctx.watch();
