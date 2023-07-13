@@ -8,19 +8,16 @@ import {
 } from "@codemirror/language";
 import { Diagnostic, linter } from "@codemirror/lint";
 import TestCaseMakerTypeDefs from "./TestCaseMakerTypeDefs.d.ts?raw";
-import { generateTestSuite } from "./TestSuiteGenerator";
 import { oneDarkHighlightStyle } from "@codemirror/theme-one-dark";
 import { colorScheme } from "..";
 import { createEffect } from "solid-js";
 
-let typescriptModule: typeof import("typescript");
-async function getTypescript() {
-  if (!typescriptModule) typescriptModule = await import("typescript");
-  return typescriptModule;
+export async function getTypescript() {
+  return (await getTsMorphBootstrap()).ts;
 }
 
 let tsMorphBootstrapModule: typeof import("@ts-morph/bootstrap");
-async function getTsMorphBootstrap() {
+export async function getTsMorphBootstrap() {
   if (!tsMorphBootstrapModule)
     tsMorphBootstrapModule = await import("@ts-morph/bootstrap");
   return tsMorphBootstrapModule;

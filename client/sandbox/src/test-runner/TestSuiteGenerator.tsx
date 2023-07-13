@@ -1,6 +1,6 @@
 import { DesmosChallenge, TestCase } from "../../../../shared/challenge";
+import { getTypescript } from "./TestCasesInput";
 import Evalbox from "./evalbox.html?raw";
-import * as ts from "typescript";
 
 type Message =
   | {
@@ -103,28 +103,33 @@ export async function generateTestSuite(
 ): Promise<DesmosChallenge | undefined> {
   await forceLoadIframe();
 
-  return await new Promise<DesmosChallenge | undefined>((resolve, reject) => {
-    const code = src.toString();
-    const transpiledCode = ts.transpileModule(code, {}).outputText;
-    const messageHandler = (msg: MessageEvent) => {
-      window.removeEventListener("message", messageHandler);
-      const data = msg.data as Message[];
-      const challenge: DesmosChallenge = { testCases: [] };
-      for (const msg of data) {
-        switch (msg.type) {
-          case "error":
-            resolve(undefined);
-            return;
-          case "test":
-            challenge.testCases.push(...generateTestCases(...msg.args));
-            break;
-          case "directTest":
-            challenge.testCases.push(...generateDirectTestCases(...msg.args));
+  return await new Promise<DesmosChallenge | undefined>(
+    async (resolve, reject) => {
+      const code = src.toString();
+      const transpiledCode = (await getTypescript()).transpileModule(
+        code,
+        {}
+      ).outputText;
+      const messageHandler = (msg: MessageEvent) => {
+        window.removeEventListener("message", messageHandler);
+        const data = msg.data as Message[];
+        const challenge: DesmosChallenge = { testCases: [] };
+        for (const msg of data) {
+          switch (msg.type) {
+            case "error":
+              resolve(undefined);
+              return;
+            case "test":
+              challenge.testCases.push(...generateTestCases(...msg.args));
+              break;
+            case "directTest":
+              challenge.testCases.push(...generateDirectTestCases(...msg.args));
+          }
         }
-      }
-      resolve(challenge);
-    };
-    window.addEventListener("message", messageHandler);
-    iframe.contentWindow?.postMessage({ code: transpiledCode }, "*");
-  });
+        resolve(challenge);
+      };
+      window.addEventListener("message", messageHandler);
+      iframe.contentWindow?.postMessage({ code: transpiledCode }, "*");
+    }
+  );
 }
