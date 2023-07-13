@@ -5,12 +5,6 @@ import { Show, createEffect, createSignal, lazy } from "solid-js";
 
 const root = document.getElementById("root");
 
-if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
-  throw new Error(
-    "Root element not found. Did you forget to add it to your index.html? Or maybe the id attribute got misspelled?"
-  );
-}
-
 import { Router, Routes, Route } from "@solidjs/router";
 import MainPage, { Logo, PageHeader, SmallLogo } from "./main-page/MainPage";
 import { Sandbox } from "./sandbox/Sandbox";
