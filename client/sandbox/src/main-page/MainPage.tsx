@@ -2,11 +2,11 @@ import "./MainPage.less";
 import { getChallenges, trpc } from "../communication/trpc-setup";
 import { For, Show, createEffect, untrack } from "solid-js";
 import { ChallengePreview } from "./ChallengePreview";
-import { StaticMath } from "../test-runner/TestCaseDisplay";
 import DesmosGraph from "./desmos-graph.png";
 import Latex from "./latex.txt?raw";
 import { Link } from "../common/better-router/BetterRoute";
 import { LightDarkToggle } from "../common/LightDarkToggle";
+import { StaticMath } from "../test-runner/output/TestCaseDisplay";
 
 export function Logo() {
   return <img class="logo" src={DesmosGraph}></img>;

@@ -47,7 +47,7 @@ export class Submission {
   @Column()
   textModeScore?: number;
 
-  @ManyToOne(() => Challenge)
+  @Column()
   challenge!: number;
 }
 
@@ -85,16 +85,23 @@ export default async function sqlite3DatabaseAPI(): Promise<DatabaseIOAPI> {
       ).map((c) => c.id);
     },
 
-    async getSubmissions(cid) {
+    async getSubmissions(opts) {
       return await AppDataSource.getRepository(Submission).find({
         where: {
-          challenge: cid,
+          challenge: opts.challengeID,
+        },
+        take: opts.limit,
+        skip: opts.offset,
+        order: {
+          textModeScore: {
+            direction: "ASC",
+          },
         },
       });
     },
 
     async submitGraph(submission) {
-      await AppDataSource.getRepository(Submission).create(submission);
+      await AppDataSource.getRepository(Submission).insert(submission);
       return true;
     },
 

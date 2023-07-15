@@ -53,5 +53,9 @@ export type DatabaseIOAPI = {
     info: ChallengeDataWithoutID
   ) => Promise<number | undefined>;
   getChallengeList: () => Promise<ChallengeID[]>;
-  getSubmissions: (cid: ChallengeID) => Promise<ChallengeSubmission[]>;
+  getSubmissions: (opts: {
+    challengeID: ChallengeID;
+    offset: number;
+    limit: number;
+  }) => Promise<ChallengeSubmission[]>;
 };

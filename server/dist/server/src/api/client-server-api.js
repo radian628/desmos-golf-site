@@ -43,7 +43,13 @@ export function createClientServerAPI(databaseIOAPI, validationAPI, secret) {
             }
             return SubmitGraphState.Failed;
         }),
-        submissions: t.procedure.input(z.number()).query(async (opts) => {
+        submissions: t.procedure
+            .input(z.object({
+            challengeID: z.number(),
+            limit: z.number(),
+            offset: z.number(),
+        }))
+            .query(async (opts) => {
             const { input } = opts;
             return await databaseIOAPI.getSubmissions(input);
         }),

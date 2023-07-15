@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Entity, PrimaryGeneratedColumn, Column, DataSource, ManyToOne, } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, DataSource, } from "typeorm";
 export let Challenge = class Challenge {
     id;
     name;
@@ -67,7 +67,7 @@ __decorate([
     __metadata("design:type", Number)
 ], Submission.prototype, "textModeScore", void 0);
 __decorate([
-    ManyToOne(() => Challenge),
+    Column(),
     __metadata("design:type", Number)
 ], Submission.prototype, "challenge", void 0);
 Submission = __decorate([
@@ -98,15 +98,22 @@ export default async function sqlite3DatabaseAPI() {
                 },
             })).map((c) => c.id);
         },
-        async getSubmissions(cid) {
+        async getSubmissions(opts) {
             return await AppDataSource.getRepository(Submission).find({
                 where: {
-                    challenge: cid,
+                    challenge: opts.challengeID,
+                },
+                take: opts.limit,
+                skip: opts.offset,
+                order: {
+                    textModeScore: {
+                        direction: "ASC",
+                    },
                 },
             });
         },
         async submitGraph(submission) {
-            await AppDataSource.getRepository(Submission).create(submission);
+            await AppDataSource.getRepository(Submission).insert(submission);
             return true;
         },
         async createNewChallenge(info) {

@@ -61,10 +61,18 @@ export function createClientServerAPI(
 
         return SubmitGraphState.Failed;
       }),
-    submissions: t.procedure.input(z.number()).query(async (opts) => {
-      const { input } = opts;
-      return await databaseIOAPI.getSubmissions(input);
-    }),
+    submissions: t.procedure
+      .input(
+        z.object({
+          challengeID: z.number(),
+          limit: z.number(),
+          offset: z.number(),
+        })
+      )
+      .query(async (opts) => {
+        const { input } = opts;
+        return await databaseIOAPI.getSubmissions(input);
+      }),
   });
 
   return appRouter;

@@ -1,0 +1,34 @@
+.failed-test-case-display {
+  border: 1px solid var(--border-color);
+  border-radius: 15px;
+  padding: 10px;
+  margin: 20px;
+
+  .screenshot-container {
+    display: flex;
+
+    .screenshot {
+      display: flex;
+      flex-direction: column;
+
+      h4 {
+        text-align: center;
+      }
+
+      canvas {
+        width: 10vw;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        margin: 10px;
+      }
+    }
+  }
+}
+
+.test-graphs-container > * {
+  margin: 20px;
+}
+
+.test-graphs-container .dcg-container {
+  border-radius: 15px;
+}

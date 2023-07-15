@@ -31,7 +31,13 @@ export function getSubmissions(cid: () => number) {
   const [submissions, setSubmissions] = createSignal<ChallengeSubmission[]>([]);
 
   const loadAll = async () => {
-    setSubmissions(await trpc.submissions.query(cid()));
+    setSubmissions(
+      await trpc.submissions.query({
+        challengeID: cid(),
+        limit: 99999999,
+        offset: 0,
+      })
+    );
   };
 
   createEffect(() => {

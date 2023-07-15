@@ -5,6 +5,9 @@ body {
   --border-color: #00000088;
   --highlight-color: #eeeeee;
   --link-color: #388c46;
+  --success-color: #069a06;
+  --pending-color: #8b8602;
+  --failure-color: #ab0a0a;
 
   background-color: var(--background-color);
   color: var(--foreground-color);
@@ -16,6 +19,14 @@ body.dark {
   --border-color: #ffffff88;
   --highlight-color: #333333;
   --link-color: #83dc92;
+  --success-color: #4fed4f;
+  --pending-color: #ebe54c;
+  --failure-color: #ee7b7b;
+
+  // make desmos dark by inverting colors
+  // .dcg-wrapper {
+  //   filter: invert(1);
+  // }
 }
 
 a {
@@ -23,10 +34,25 @@ a {
   text-decoration: none;
 }
 
-input {
+input,
+textarea {
   background-color: var(--background-color);
   border: 1px solid var(--border-color);
   padding: 5px;
   border-radius: 10px;
   color: var(--foreground-color);
+}
+
+button {
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  color: var(--link-color);
+  border-radius: 10px;
+  transition: background-color 0.25s;
+  cursor: pointer;
+  padding: 5px;
+
+  &:hover {
+    background-color: var(--highlight-color);
+  }
 }

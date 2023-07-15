@@ -9,8 +9,8 @@ export type ValidationAPI = {
 
 export function dummyValidationAPI(): ValidationAPI {
   return {
-    getGraphStateLength: async () => Infinity,
-    getTextModeLength: async () => Infinity,
+    getGraphStateLength: async () => 999999999,
+    getTextModeLength: async () => 999999999,
     validateThatGraphPassesTestSuite: async () => true,
   };
 }
