@@ -35,6 +35,7 @@ export async function puppeteerValidationAPI(
         opts.graphLink
       );
       console.log("Validation result: ", result);
+      page.close();
       return result === true;
     },
   };

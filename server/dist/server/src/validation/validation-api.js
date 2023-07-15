@@ -17,6 +17,7 @@ export async function puppeteerValidationAPI(basepath) {
             await page.waitForSelector(".verify-is-ready");
             const result = await page.evaluate(async (graphLink) => (await window.verifyGraph(graphLink)).length === 0, opts.graphLink);
             console.log("Validation result: ", result);
+            page.close();
             return result === true;
         },
     };
