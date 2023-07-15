@@ -84,3 +84,14 @@ export function useFetchDesmosJson(url: () => string) {
 
   return res;
 }
+
+export function poll(handler: () => boolean) {
+  return new Promise<void>((resolve, reject) => {
+    const interval = setInterval(() => {
+      if (handler()) {
+        clearInterval(interval);
+        resolve();
+      }
+    });
+  });
+}

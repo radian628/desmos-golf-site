@@ -4,7 +4,7 @@ import * as trpcExpress from "@trpc/server/adapters/express";
 import { createClientServerAPI } from "./api/client-server-api.js";
 import sqlite3DatabaseAPI from "./db/sqlite-db-io-api.js";
 import * as fs from "node:fs/promises";
-import { dummyValidationAPI } from "./validation/validation-api.js";
+import { puppeteerValidationAPI, } from "./validation/validation-api.js";
 import { exit } from "node:process";
 const secret = (await fs.readFile("secret.txt").catch(() => {
     console.error("Create a secret.txt file under the server directory so you have a key for database write access!");
@@ -12,9 +12,9 @@ const secret = (await fs.readFile("secret.txt").catch(() => {
 })).toString();
 const config = await getServerConfig();
 const app = express();
-const api = createClientServerAPI(await sqlite3DatabaseAPI(), dummyValidationAPI(), secret);
+const api = createClientServerAPI(await sqlite3DatabaseAPI(), await puppeteerValidationAPI(`http://${config.hostname}:${config.port}`), secret);
 app.use(express.static("../client/sandbox/dist"));
-const indexRoutes = ["/", "/sandbox", "/challenge/*"];
+const indexRoutes = ["/", "/sandbox", "/challenge/*", "/verify/*"];
 for (const r of indexRoutes) {
     app.get(r, async (req, res) => {
         try {

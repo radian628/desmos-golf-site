@@ -97,6 +97,8 @@ export async function waitForOnEvaluatorChangesEvents(calc: Calc, n: number) {
 export function calcObjectToChallengeInterface(calc: Calc): ChallengeInterface {
   let time = 0;
 
+  console.log(calc);
+
   let originalGraphState = calc.getState();
 
   async function uriToBitmap(uri: string): Promise<number[]> {

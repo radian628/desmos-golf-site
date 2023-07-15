@@ -4,6 +4,8 @@ import MathQuill from "mathquill-commonjs";
 import "mathquill-commonjs/mathquill.css";
 import {
   FailedTestCaseOutput,
+  NormalFailedTestCaseOutput,
+  SpecialFailedTestCaseOutput,
   serializeDesmosData,
 } from "../../../../../shared/execute-challenge";
 const MQ = MathQuill.getInterface(2);
@@ -40,8 +42,14 @@ export function Bitmap(props: { pixels: () => number[]; width: () => number }) {
 
 import "./TestCaseDisplay.less";
 
-export function FailedTestCaseDisplay(props: {
-  case: () => FailedTestCaseOutput;
+export function SpecialFailedTestCaseDisplay(props: {
+  case: () => SpecialFailedTestCaseOutput;
+}) {
+  return <div class="failed-test-case-display">{props.case().reason}</div>;
+}
+
+export function NormalFailedTestCaseDisplay(props: {
+  case: () => NormalFailedTestCaseOutput;
 }) {
   return (
     <div class="failed-test-case-display">

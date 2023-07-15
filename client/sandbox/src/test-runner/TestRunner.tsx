@@ -11,6 +11,7 @@ import {
   waitForOnEvaluatorChangesEvents,
 } from "../../../../shared/challenge-interface";
 import "./TestRunner.css";
+import { poll } from "../common/utils";
 
 async function getGraph(
   link: string
@@ -66,6 +67,8 @@ export function TestRunner(props: {
 
   let container: HTMLDivElement;
 
+  let ready = false;
+
   return {
     element: (
       <div>
@@ -81,6 +84,7 @@ export function TestRunner(props: {
               const calc = (await getDesmos()).GraphingCalculator(inner, {});
               setTestCalc(calc);
               initializeGraphState();
+              ready = true;
             });
           }}
         ></div>
@@ -88,6 +92,8 @@ export function TestRunner(props: {
     ),
     runTestSuite: async () => {
       console.log("test suite", props.testSuite());
+
+      await poll(() => ready);
 
       // remove all reference graphs
       for (const [link, rg] of referenceGraphs().entries()) {

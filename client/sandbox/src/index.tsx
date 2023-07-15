@@ -1,6 +1,6 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
-
+import "./verify/Verify";
 import { Show, createEffect, createSignal, lazy } from "solid-js";
 
 const root = document.getElementById("root");

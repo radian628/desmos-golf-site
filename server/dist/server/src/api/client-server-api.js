@@ -31,7 +31,7 @@ export function createClientServerAPI(databaseIOAPI, validationAPI, secret) {
                 return SubmitGraphState.Error;
             const passed = await validationAPI.validateThatGraphPassesTestSuite({
                 graphLink: input.graphLink,
-                testSuite: challenge.testSuite,
+                challengeID: input.challenge,
             });
             if (passed) {
                 databaseIOAPI.submitGraph({

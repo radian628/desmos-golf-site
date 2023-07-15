@@ -43,7 +43,7 @@ export function createClientServerAPI(
 
         const passed = await validationAPI.validateThatGraphPassesTestSuite({
           graphLink: input.graphLink,
-          testSuite: challenge.testSuite,
+          challengeID: input.challenge,
         });
 
         if (passed) {

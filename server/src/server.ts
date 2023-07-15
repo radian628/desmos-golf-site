@@ -7,7 +7,10 @@ import * as trpcExpress from "@trpc/server/adapters/express";
 import { createClientServerAPI } from "./api/client-server-api.js";
 import sqlite3DatabaseAPI from "./db/sqlite-db-io-api.js";
 import * as fs from "node:fs/promises";
-import { dummyValidationAPI } from "./validation/validation-api.js";
+import {
+  dummyValidationAPI,
+  puppeteerValidationAPI,
+} from "./validation/validation-api.js";
 import { exit } from "node:process";
 
 const secret = (
@@ -25,13 +28,13 @@ const app = express();
 
 const api = createClientServerAPI(
   await sqlite3DatabaseAPI(),
-  dummyValidationAPI(),
+  await puppeteerValidationAPI(`http://${config.hostname}:${config.port}`),
   secret
 );
 
 app.use(express.static("../client/sandbox/dist"));
 
-const indexRoutes = ["/", "/sandbox", "/challenge/*"];
+const indexRoutes = ["/", "/sandbox", "/challenge/*", "/verify/*"];
 
 for (const r of indexRoutes) {
   app.get(r, async (req, res) => {

@@ -1,6 +1,9 @@
 import { For } from "solid-js";
 import { FailedTestCaseOutput } from "../../../../../shared/execute-challenge";
-import { FailedTestCaseDisplay } from "./TestCaseDisplay";
+import {
+  NormalFailedTestCaseDisplay,
+  SpecialFailedTestCaseDisplay,
+} from "./TestCaseDisplay";
 
 export function TestRunnerOutput(props: {
   testsFailed: () => FailedTestCaseOutput[];
@@ -15,9 +18,17 @@ export function TestRunnerOutput(props: {
             Failed:
           </h2>
           <For each={props.testsFailed()}>
-            {(f) => (
-              <FailedTestCaseDisplay case={() => f}></FailedTestCaseDisplay>
-            )}
+            {(f) =>
+              f.type === "normal" ? (
+                <NormalFailedTestCaseDisplay
+                  case={() => f}
+                ></NormalFailedTestCaseDisplay>
+              ) : (
+                <SpecialFailedTestCaseDisplay
+                  case={() => f}
+                ></SpecialFailedTestCaseDisplay>
+              )
+            }
           </For>
         </>
       ) : (

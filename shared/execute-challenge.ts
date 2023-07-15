@@ -53,7 +53,8 @@ export function serializeDesmosData(data: DesmosData): string {
   }
 }
 
-export type FailedTestCaseOutput = {
+export type NormalFailedTestCaseOutput = {
+  type: "normal";
   inputs: {
     name: string;
     value: DesmosData;
@@ -70,6 +71,15 @@ export type FailedTestCaseOutput = {
     reference: DesmosData;
   }[];
 };
+
+export type SpecialFailedTestCaseOutput = {
+  type: "special";
+  reason: string;
+};
+
+export type FailedTestCaseOutput =
+  | NormalFailedTestCaseOutput
+  | SpecialFailedTestCaseOutput;
 
 type TestCaseOutput = {
   inputs: {
@@ -171,7 +181,8 @@ export async function executeTestCase(
   ifaces: ChallengeInterfaces,
   test: TestCase
 ): Promise<
-  { success: true } | { success: false; output?: FailedTestCaseOutput }
+  | { success: true }
+  | { success: false; output?: FailedTestCaseOutput; reason: string }
 > {
   // create and run a test case for the reference graph, if applicable
   const testCaseForReference: TestCase = {
@@ -189,7 +200,11 @@ export async function executeTestCase(
     );
     if (!referenceGraphInterface) {
       console.warn("Test uses references without a reference graph!");
-      return { success: false };
+      return {
+        success: false,
+        reason:
+          "Bad Test Suite: Test uses references without a reference graph!",
+      };
     }
     referenceTestCaseOutput = await runTestCase(
       referenceGraphInterface,
@@ -241,12 +256,16 @@ export async function executeTestCase(
 
   const outputIfFailure: FailedTestCaseOutput = {
     inputs: testCaseOutput.inputs,
+    type: "normal",
   };
 
   // ensure that output screenshot is as expected
   if (testCaseOutput.outputScreenshot && expectedScreenshot) {
     if (testCaseOutput.outputScreenshot.length != expectedScreenshot.length)
-      return { success: false };
+      return {
+        success: false,
+        reason: "Actual and expected screenshots are of different resolutions!",
+      };
     let diff = 0;
     for (let i = 0; i < expectedScreenshot.length; i++) {
       diff += Math.abs(
@@ -264,7 +283,11 @@ export async function executeTestCase(
     };
 
     if (normalizedDiff > (test.screenshot?.invalidSubmissionThreshold ?? -1))
-      return { success: false, output: outputIfFailure };
+      return {
+        success: false,
+        output: outputIfFailure,
+        reason: "Bad screenshot!",
+      };
   }
 
   // ensure that output expressions are as expected
@@ -272,7 +295,7 @@ export async function executeTestCase(
     outputIfFailure.outputs = [];
 
     if (testCaseOutput.outputExpressions.length != expectedOutput.data.length) {
-      return { success: false };
+      return { success: false, reason: `Not enough output expressions! Expected ${expectedOutput.data.length} output expressions; got ${testCaseOutput.outputExpressions.length}` };
     } else {
       let failure = false;
       for (let i = 0; i < expectedOutput.data.length; i++) {
@@ -291,7 +314,12 @@ export async function executeTestCase(
         )
           failure = true;
       }
-      if (failure) return { success: false, output: outputIfFailure };
+      if (failure)
+        return {
+          success: false,
+          output: outputIfFailure,
+          reason: "Wrong expression outputs!",
+        };
     }
   }
 
@@ -301,15 +329,22 @@ export async function executeTestCase(
 export async function executeChallenge(
   ifaces: ChallengeInterfaces,
   challenge: DesmosChallenge
-) {
+): Promise<FailedTestCaseOutput[]> {
   let testIndex = 0;
   let testsFailed: FailedTestCaseOutput[] = [];
   for (const test of challenge.testCases) {
     const passed = await executeTestCase(ifaces, test);
     console.log("TEST", passed);
 
-    if (!passed.success && passed.output) {
-      testsFailed.push(passed.output);
+    if (!passed.success) {
+      if (passed.output) {
+        testsFailed.push(passed.output);
+      } else {
+        testsFailed.push({
+          type: "special",
+          reason: passed.reason,
+        });
+      }
     }
 
     testIndex++;
