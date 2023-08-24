@@ -76,15 +76,13 @@ export function TestCasesInput(
                       },
                     });
 
-                    const testfn = <T,>(t: T) => t;
-
-                    const mainFile = project.createSourceFile(
+                    project.createSourceFile(
                       "main.ts",
                       view.state.doc.toString()
                     );
 
                     if (!props.readonly) {
-                      const testRunnerTypeDefs = project.createSourceFile(
+                      project.createSourceFile(
                         "testrunner.d.ts",
                         TestCaseMakerTypeDefs
                       );

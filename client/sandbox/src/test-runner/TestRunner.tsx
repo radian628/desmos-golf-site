@@ -1,4 +1,4 @@
-import { For, createEffect, createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { DesmosChallenge } from "../../../../shared/challenge";
 import {
   FailedTestCaseOutput,
@@ -26,7 +26,7 @@ async function getGraph(
 }
 
 function getDesmos() {
-  return new Promise<typeof Desmos>((resolve, reject) => {
+  return new Promise<typeof Desmos>((resolve) => {
     const interval = setInterval(() => {
       if (window.Desmos) {
         console.log("desmos is loaded");
@@ -46,7 +46,7 @@ export function TestRunner(props: {
 }) {
   console.log("current state of desmso", window.Desmos);
 
-  const [testCalc, setTestCalc] = createSignal<any>();
+  const [testCalc, setTestCalc] = createSignal<Desmos.Calculator>();
 
   const [referenceGraphs, setReferenceGraphs] = createSignal<
     Map<
@@ -96,7 +96,7 @@ export function TestRunner(props: {
       await poll(() => ready);
 
       // remove all reference graphs
-      for (const [link, rg] of referenceGraphs().entries()) {
+      for (const [, rg] of referenceGraphs().entries()) {
         rg.graph.destroy();
         rg.el.parentElement?.removeChild(rg.el);
       }

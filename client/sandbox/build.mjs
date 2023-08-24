@@ -5,8 +5,18 @@ import * as fs from "node:fs/promises";
 import * as chokidar from "chokidar";
 import * as path from "node:path";
 
-console.log("Build started.");
+console.log("Client build script ran with ", process.argv);
 
+const isDev = process.argv.includes("dev");
+
+if (isDev) {
+  console.log("Building for development.");
+} else {
+  console.log("Building for production.");
+}
+
+// plugin for the ?raw query param
+// to make "raw" resources use the text loader
 const rawQueryParamPlugin = {
   name: "raw",
   setup(build) {
@@ -27,11 +37,13 @@ const rawQueryParamPlugin = {
   },
 };
 
+// watch for changes to index.html
 chokidar.watch(["index.html"]).on("all", (evt, path) => {
   console.log("Detected change to", path);
   fs.cp("index.html", "dist/index.html");
 });
 
+// actually build
 let ctx = await esbuild.context({
   entryPoints: ["src/index.tsx"],
   outdir: "dist",
@@ -64,12 +76,17 @@ let ctx = await esbuild.context({
     ".png": "file",
     ".ttf": "file",
   },
-  sourcemap: true,
+  sourcemap: isDev,
   format: "esm",
   publicPath: "/",
-  minify: true,
+  minify: !isDev,
 });
 
-ctx.watch();
+if (isDev) {
+  ctx.watch();
+} else {
+  await ctx.rebuild();
+  process.exit(0);
+}
 
 console.log("Watching for changes...");

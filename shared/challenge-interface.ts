@@ -79,11 +79,11 @@ export type Calc = {
 
 export async function waitForOnEvaluatorChangesEvents(calc: Calc, n: number) {
   let evaluatorChangesCounter = 0;
-  let dispatcher = calc.controller.dispatcher.register((evt) => {
+  const dispatcher = calc.controller.dispatcher.register((evt) => {
     if (evt.type === "on-evaluator-changes") evaluatorChangesCounter++;
   });
 
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<void>((resolve) => {
     const interval = setInterval(() => {
       if (evaluatorChangesCounter >= n) {
         calc.controller.dispatcher.unregister(dispatcher);
@@ -99,7 +99,7 @@ export function calcObjectToChallengeInterface(calc: Calc): ChallengeInterface {
 
   console.log(calc);
 
-  let originalGraphState = calc.getState();
+  const originalGraphState = calc.getState();
 
   async function uriToBitmap(uri: string): Promise<number[]> {
     // dataurl -> blob -> ImageBitmap
@@ -121,11 +121,11 @@ export function calcObjectToChallengeInterface(calc: Calc): ChallengeInterface {
     async doTickerStep() {
       // count # of "on-evaluator-changes" events
       let evaluatorChangesCounter = 0;
-      let dispatcher = calc.controller.dispatcher.register((evt) => {
+      const dispatcher = calc.controller.dispatcher.register((evt) => {
         if (evt.type === "on-evaluator-changes") evaluatorChangesCounter++;
       });
       calc.controller.dispatch({ type: "tick-ticker", time: time++ });
-      return new Promise<boolean>((resolve, reject) => {
+      return new Promise<boolean>((resolve) => {
         // keep polling until ticker step is completed
         const interval = setInterval(() => {
           // ticker succeeded once two on-evaluator-changes events are detected
@@ -159,7 +159,7 @@ export function calcObjectToChallengeInterface(calc: Calc): ChallengeInterface {
 
     async getScreenshotBitmap(opts) {
       // take screenshot
-      const screenshot = await new Promise<string>((resolve, reject) => {
+      const screenshot = await new Promise<string>((resolve) => {
         calc.asyncScreenshot(
           {
             mathBounds: {

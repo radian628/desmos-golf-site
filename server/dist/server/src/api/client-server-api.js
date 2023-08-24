@@ -20,6 +20,8 @@ export function createClientServerAPI(databaseIOAPI, validationAPI, secret) {
             .input(CreateNewChallengeArgsParser)
             .mutation(async (opts) => {
             const { input } = opts;
+            if (input.secret !== secret)
+                return -1;
             return await databaseIOAPI.createNewChallenge(input.challenge);
         }),
         submitGraph: t.procedure

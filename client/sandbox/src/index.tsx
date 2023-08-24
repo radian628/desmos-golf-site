@@ -1,23 +1,15 @@
 /* @refresh reload */
 import { render } from "solid-js/web";
 import "./verify/Verify";
-import { Show, createEffect, createSignal, lazy } from "solid-js";
+import { Show, createEffect, createSignal } from "solid-js";
 
 const root = document.getElementById("root");
 
-import { Router, Routes, Route } from "@solidjs/router";
-import MainPage, { Logo, PageHeader, SmallLogo } from "./main-page/MainPage";
+import MainPage, { PageHeader } from "./main-page/MainPage";
 import { Sandbox } from "./sandbox/Sandbox";
 import ChallengePage from "./challenge-page/ChallengePage";
-import {
-  BetterRoute,
-  Link,
-  SpecialRoutes,
-  pathname,
-} from "./common/better-router/BetterRoute";
+import { BetterRoute, pathname } from "./common/better-router/BetterRoute";
 import { LightDarkToggle } from "./common/LightDarkToggle";
-
-const TestRunner = lazy(() => import("./test-runner/TestRunnerPage"));
 
 const [challengeID, setChallengeID] = createSignal("");
 

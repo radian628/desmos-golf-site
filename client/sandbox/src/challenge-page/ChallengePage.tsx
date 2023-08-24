@@ -29,9 +29,7 @@ export default function ChallengePage(props: { challengeID: () => string }) {
     setChallengeDataCopy(challengeData());
   });
 
-  const [submissions, reloadSubmissions] = getSubmissions(() =>
-    Number(props.challengeID())
-  );
+  const [submissions] = getSubmissions(() => Number(props.challengeID()));
 
   const [testGraphLink, setTestGraphLink] = createSignal<string>("");
 
@@ -170,7 +168,4 @@ export default function ChallengePage(props: { challengeID: () => string }) {
       </Show>
     </>
   );
-}
-function delayedTestCasesSpec(): any {
-  throw new Error("Function not implemented.");
 }

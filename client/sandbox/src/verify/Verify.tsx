@@ -1,13 +1,17 @@
 import { render } from "solid-js/web";
-import { useFetchDesmosJson } from "../common/utils";
 import { TestRunner } from "../test-runner/TestRunner";
 import { generateTestSuite } from "../test-runner/TestSuiteGenerator";
 import { trpc } from "../communication/trpc-setup";
 import { FailedTestCaseOutput } from "../../../../shared/execute-challenge";
 
-export async function verifyGraph(graphLink: string) {
-  const graph = useFetchDesmosJson(() => graphLink);
+declare global {
+  interface Window {
+    testOutput?: FailedTestCaseOutput[];
+    verifyGraph: typeof verifyGraph;
+  }
+}
 
+export async function verifyGraph(graphLink: string) {
   const challenge = await trpc.challengeData.query(
     Number(window.location.pathname.split("/")[2])
   );
@@ -18,25 +22,25 @@ export async function verifyGraph(graphLink: string) {
     testSuite: () => testSuite!,
     testGraphLink: () => graphLink,
     setTestOutput: (output) => {
-      (window as any).testOutput = output;
+      window.testOutput = output;
     },
-    setTestGraphLink: (tgl) => {},
+    setTestGraphLink: () => {},
     setHasRunTests: () => {},
   });
 
   render(() => testRunner.element, document.body);
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     testRunner.runTestSuite();
     const interval = setInterval(() => {
-      if ((window as any).testOutput) {
-        resolve((window as any).testOutput as FailedTestCaseOutput[]);
+      if (window.testOutput) {
+        resolve(window.testOutput as FailedTestCaseOutput[]);
         clearInterval(interval);
-        delete (window as any).testOutput;
+        delete window.testOutput;
       }
     });
   });
 }
 
-(window as any).verifyGraph = verifyGraph;
+window.verifyGraph = verifyGraph;
 document.body.classList.toggle("verify-is-ready");

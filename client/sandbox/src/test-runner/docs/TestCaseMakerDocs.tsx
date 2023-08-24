@@ -13,7 +13,7 @@ export function TestCaseMakerDocs() {
       }}
     >
       <header
-        onClick={(e) => {
+        onClick={() => {
           setIsExpanded(!isExpanded());
         }}
       >

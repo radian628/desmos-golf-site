@@ -1,6 +1,5 @@
 import { initTRPC } from "@trpc/server";
 import {
-  ChallengeDataParser,
   CreateNewChallengeArgsParser,
   DatabaseIOAPI,
   SubmitGraphArgsParser,
@@ -31,6 +30,7 @@ export function createClientServerAPI(
       .input(CreateNewChallengeArgsParser)
       .mutation(async (opts) => {
         const { input } = opts;
+        if (input.secret !== secret) return -1;
         return await databaseIOAPI.createNewChallenge(input.challenge);
       }),
     submitGraph: t.procedure

@@ -1,4 +1,3 @@
-import { A } from "@solidjs/router";
 import { ChallengeData } from "../../../../server/src/db/db-io-api";
 
 import "./ChallengePreview.less";

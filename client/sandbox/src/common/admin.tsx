@@ -1,4 +1,4 @@
-import { Component, JSX, Show } from "solid-js";
+import { JSX, Show } from "solid-js";
 
 function parseQueryString(str: string) {
   return new Map(

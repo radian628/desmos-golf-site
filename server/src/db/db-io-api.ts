@@ -1,7 +1,6 @@
 import * as z from "zod";
 
 type ChallengeID = number;
-type TestSuite = string;
 export const ChallengeDataParser = z.object({
   id: z.number(),
   name: z.string(),

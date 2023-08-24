@@ -3,7 +3,6 @@ import {
   Show,
   children,
   createContext,
-  createEffect,
   createSignal,
   useContext,
 } from "solid-js";

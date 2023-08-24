@@ -1,9 +1,8 @@
-import { For, Show, children, createEffect } from "solid-js";
+import { For, Show, createEffect } from "solid-js";
 
 import MathQuill from "mathquill-commonjs";
 import "mathquill-commonjs/mathquill.css";
 import {
-  FailedTestCaseOutput,
   NormalFailedTestCaseOutput,
   SpecialFailedTestCaseOutput,
   serializeDesmosData,

@@ -4,7 +4,7 @@ import * as trpcExpress from "@trpc/server/adapters/express";
 import { createClientServerAPI } from "./api/client-server-api.js";
 import sqlite3DatabaseAPI from "./db/sqlite-db-io-api.js";
 import * as fs from "node:fs/promises";
-import { puppeteerValidationAPI, } from "./validation/validation-api.js";
+import { puppeteerValidationAPI } from "./validation/validation-api.js";
 import { exit } from "node:process";
 const secret = (await fs.readFile("secret.txt").catch(() => {
     console.error("Create a secret.txt file under the server directory so you have a key for database write access!");

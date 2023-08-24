@@ -15,7 +15,9 @@ export async function puppeteerValidationAPI(basepath) {
             const page = await browser.newPage();
             await page.goto(basepath + `/verify/${opts.challengeID}`);
             await page.waitForSelector(".verify-is-ready");
-            const result = await page.evaluate(async (graphLink) => (await window.verifyGraph(graphLink)).length === 0, opts.graphLink);
+            const result = await page.evaluate(async (graphLink) => 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (await window.verifyGraph(graphLink)).length === 0, opts.graphLink);
             console.log("Validation result: ", result);
             page.close();
             return result === true;

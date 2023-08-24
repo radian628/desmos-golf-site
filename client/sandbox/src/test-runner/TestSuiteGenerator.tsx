@@ -63,11 +63,11 @@ const generateDirectTestCases: <
         type: "data",
         data: c.out.map((e, i) => ({
           expectedValue: {
-            // @ts-expect-error
+            // @ts-expect-error type inference being dumb here
             value: e.data,
             type: settings.outputTypes[i],
           },
-          // @ts-expect-error
+          // @ts-expect-error type inference being dumb here
           threshold: e.threshold ?? 0,
         })),
       },
@@ -81,7 +81,7 @@ let iframe: HTMLIFrameElement;
 function forceLoadIframe() {
   if (iframe) return;
   iframe = document.createElement("iframe");
-  const promise = new Promise<void>((resolve, reject) => {
+  const promise = new Promise<void>((resolve) => {
     const handler = () => {
       iframe.removeEventListener("load", handler);
       resolve();
@@ -103,33 +103,32 @@ export async function generateTestSuite(
 ): Promise<DesmosChallenge | undefined> {
   await forceLoadIframe();
 
-  return await new Promise<DesmosChallenge | undefined>(
-    async (resolve, reject) => {
-      const code = src.toString();
-      const transpiledCode = (await getTypescript()).transpileModule(
-        code,
-        {}
-      ).outputText;
-      const messageHandler = (msg: MessageEvent) => {
-        window.removeEventListener("message", messageHandler);
-        const data = msg.data as Message[];
-        const challenge: DesmosChallenge = { testCases: [] };
-        for (const msg of data) {
-          switch (msg.type) {
-            case "error":
-              resolve(undefined);
-              return;
-            case "test":
-              challenge.testCases.push(...generateTestCases(...msg.args));
-              break;
-            case "directTest":
-              challenge.testCases.push(...generateDirectTestCases(...msg.args));
-          }
+  // eslint-disable-next-line no-async-promise-executor
+  return await new Promise<DesmosChallenge | undefined>(async (resolve) => {
+    const code = src.toString();
+    const transpiledCode = (await getTypescript()).transpileModule(
+      code,
+      {}
+    ).outputText;
+    const messageHandler = (msg: MessageEvent) => {
+      window.removeEventListener("message", messageHandler);
+      const data = msg.data as Message[];
+      const challenge: DesmosChallenge = { testCases: [] };
+      for (const msg of data) {
+        switch (msg.type) {
+          case "error":
+            resolve(undefined);
+            return;
+          case "test":
+            challenge.testCases.push(...generateTestCases(...msg.args));
+            break;
+          case "directTest":
+            challenge.testCases.push(...generateDirectTestCases(...msg.args));
         }
-        resolve(challenge);
-      };
-      window.addEventListener("message", messageHandler);
-      iframe.contentWindow?.postMessage({ code: transpiledCode }, "*");
-    }
-  );
+      }
+      resolve(challenge);
+    };
+    window.addEventListener("message", messageHandler);
+    iframe.contentWindow?.postMessage({ code: transpiledCode }, "*");
+  });
 }

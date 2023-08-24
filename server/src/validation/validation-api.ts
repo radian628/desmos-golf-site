@@ -31,6 +31,7 @@ export async function puppeteerValidationAPI(
       await page.waitForSelector(".verify-is-ready");
       const result = await page.evaluate(
         async (graphLink) =>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (await (window as any).verifyGraph(graphLink)).length === 0,
         opts.graphLink
       );

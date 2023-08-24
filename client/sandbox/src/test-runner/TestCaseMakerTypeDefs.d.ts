@@ -62,8 +62,10 @@ type WithThreshold<T> = {
   threshold?: number;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type WithThresholdArray<A extends readonly any[]> = A extends readonly [
   infer Start,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ...infer Rest extends readonly any[],
 ]
   ? [WithThreshold<Start>, ...WithThresholdArray<Rest>]

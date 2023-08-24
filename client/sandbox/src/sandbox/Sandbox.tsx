@@ -34,9 +34,9 @@ export function Sandbox() {
               secret,
             });
 
-            // if (id !== undefined) {
-            //   navigate(`/challenge/${id}`);
-            // }
+            if (id !== undefined) {
+              history.pushState(undefined, "", `/challenge/${id}/submissions`);
+            }
           }}
         ></AddOrUpdateNewChallengeForm>
       </AdminOnly>
@@ -60,6 +60,7 @@ export function Sandbox() {
             testSuite: v,
           })
         }
+        setTestOutput={() => {}}
       ></TestRunnerPage>
     </>
   );

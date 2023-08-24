@@ -1,5 +1,4 @@
 import { JSXElement, Show, children, createSignal } from "solid-js";
-import { Portal } from "solid-js/web";
 
 import "./Tooltip.less";
 

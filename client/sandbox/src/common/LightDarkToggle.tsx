@@ -6,7 +6,7 @@ export function LightDarkToggle() {
   return (
     <button
       class="light-dark-toggle"
-      onClick={(e) => {
+      onClick={() => {
         setColorScheme(colorScheme() === "dark" ? "light" : "dark");
       }}
     >

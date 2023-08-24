@@ -1,16 +1,6 @@
-import {
-  ChallengeData,
-  ChallengeSubmission,
-  DatabaseIOAPI,
-} from "./db-io-api.js";
+import { DatabaseIOAPI } from "./db-io-api.js";
 
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  DataSource,
-  ManyToOne,
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, DataSource } from "typeorm";
 
 @Entity("Challenge")
 export class Challenge {

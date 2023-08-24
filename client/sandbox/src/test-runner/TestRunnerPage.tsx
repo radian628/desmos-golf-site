@@ -1,69 +1,14 @@
-import {
-  createSignal,
-  type Component,
-  createEffect,
-  Signal,
-  Accessor,
-  Show,
-} from "solid-js";
+import { Accessor, Show } from "solid-js";
 import { TestRunner } from "./TestRunner";
 import { DesmosChallenge } from "../../../../shared/challenge";
 import { TestCasesInput } from "./TestCasesInput";
 import { generateTestSuite } from "./TestSuiteGenerator";
 import "./App.less";
-import { delayChangesTo, delayedEffect } from "./DelayedEffect";
+import { delayChangesTo } from "./DelayedEffect";
 import { TestCaseMakerDocs } from "../test-runner/docs/TestCaseMakerDocs";
 import { Portal } from "solid-js/web";
 import { FailedTestCaseOutput } from "../../../../shared/execute-challenge";
 import { asyncify } from "../common/utils";
-
-const SampleTestSuite1 = {
-  testCases: [-10, -8, -6, -4, -2, 1, 2, 4, 6, 8, 10].map((n) => {
-    return {
-      referenceGraphLink: "https://www.desmos.com/calculator/nswkvhym4k",
-      useTicker: false,
-      input: [
-        {
-          type: "number",
-          value: n,
-        },
-      ],
-      expectedOutput: {
-        type: "reference",
-        thresholds: [0.01],
-      },
-    };
-  }),
-};
-
-const SampleTestSuite2: DesmosChallenge = {
-  testCases: [-10, -8, -6, -4, -2, 1, 2, 4, 6, 8, 10].map((n) => {
-    return {
-      referenceGraphLink: "https://www.desmos.com/calculator/6yampiamhp",
-      useTicker: false,
-      input: [
-        {
-          type: "number",
-          value: n,
-        },
-      ],
-      screenshot: {
-        minX: -10,
-        maxX: 10,
-        minY: -10,
-        maxY: 10,
-        widthInPixels: 512,
-        heightInPixels: 512,
-
-        invalidSubmissionThreshold: 0.001,
-
-        expectedOutput: {
-          type: "reference",
-        },
-      },
-    };
-  }),
-};
 
 const TestRunnerPage = (props: {
   testCasesSpec: () => string;

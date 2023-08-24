@@ -111,5 +111,5 @@ export const trpc = createTRPCProxyClient<
   ],
 });
 
-// @ts-expect-error
+// @ts-expect-error make api calls from the window
 window.trpc = trpc;

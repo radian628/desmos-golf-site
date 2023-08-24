@@ -1,11 +1,10 @@
 import "./MainPage.less";
-import { getChallenges, trpc } from "../communication/trpc-setup";
+import { getChallenges } from "../communication/trpc-setup";
 import { For, Show, createEffect, untrack } from "solid-js";
 import { ChallengePreview } from "./ChallengePreview";
 import DesmosGraph from "./desmos-graph.png";
 import Latex from "./latex.txt?raw";
 import { Link } from "../common/better-router/BetterRoute";
-import { LightDarkToggle } from "../common/LightDarkToggle";
 import { StaticMath } from "../test-runner/output/TestCaseDisplay";
 
 export function Logo() {
@@ -26,7 +25,7 @@ export function PageHeader() {
   );
 }
 
-export default function MainPage(props: {}) {
+export default function MainPage() {
   const challenges = getChallenges();
 
   createEffect(() => {

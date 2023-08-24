@@ -1,16 +1,10 @@
 import express from "express";
 import { getServerConfig } from "./server-config.js";
-import bodyParser from "body-parser";
-import { apiCallParser } from "../../shared/validation.js";
-import { submitGraph } from "./submit.js";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import { createClientServerAPI } from "./api/client-server-api.js";
 import sqlite3DatabaseAPI from "./db/sqlite-db-io-api.js";
 import * as fs from "node:fs/promises";
-import {
-  dummyValidationAPI,
-  puppeteerValidationAPI,
-} from "./validation/validation-api.js";
+import { puppeteerValidationAPI } from "./validation/validation-api.js";
 import { exit } from "node:process";
 
 const secret = (

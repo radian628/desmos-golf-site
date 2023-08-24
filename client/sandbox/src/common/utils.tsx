@@ -1,7 +1,7 @@
 import {
   Accessor,
-  JSX,
   JSXElement,
+  Show,
   createEffect,
   createResource,
   createSignal,
@@ -44,17 +44,29 @@ export function asyncify<T>(value: () => Promise<T>): Accessor<T | undefined> {
   return v;
 }
 
+export type Variant<
+  Union,
+  TypeKey extends keyof Union,
+  TypeValue extends Union[TypeKey],
+> = Union & Record<TypeKey, TypeValue>;
+
+export type TypeVariant<Union extends { type: unknown }, TypeValue> = Variant<
+  Union,
+  "type",
+  TypeValue
+>;
+
 export function useFetchDesmosJson(url: () => string) {
   const res = createResource<
     | { type: "pending" | "failure" }
     | {
-        data: { title: string };
+        data: { title: string; thumbUrl: string };
         type: "success";
       },
     string
   >(
     url,
-    async (k, info) => {
+    async () => {
       const json = await (
         await fetch(url(), {
           headers: { Accept: "application/json" },
@@ -86,7 +98,7 @@ export function useFetchDesmosJson(url: () => string) {
 }
 
 export function poll(handler: () => boolean) {
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<void>((resolve) => {
     const interval = setInterval(() => {
       if (handler()) {
         clearInterval(interval);
@@ -95,3 +107,40 @@ export function poll(handler: () => boolean) {
     });
   });
 }
+
+export function NarrowShow<T, IfTrue extends T>(props: {
+  data: () => T;
+  cond: (t: T) => t is IfTrue;
+  true: (t: IfTrue) => JSXElement;
+  false: (f: Exclude<T, IfTrue>) => JSXElement;
+}) {
+  return (
+    <Show
+      when={props.cond(props.data())}
+      fallback={props.false(props.data() as Exclude<T, IfTrue>)}
+    >
+      {props.true(props.data() as IfTrue)}
+    </Show>
+  );
+}
+
+export type Branch<T, IfTrue extends T> = [
+  (t: T) => t is IfTrue,
+  (data: IfTrue) => JSXElement,
+];
+
+// todo: fix this
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// export function NarrowMatch<
+//   T,
+//   U extends T,
+//   Branches extends Branch<T, U>[],
+// >(props: { data: () => T; branches: Branches }) {
+//   return (
+//     <Switch>
+//       {props.branches.map(([k, v]) => (
+//         <Match when={k(props.data())}>{v(props.data())}</Match>
+//       ))}
+//     </Switch>
+//   );
+// }

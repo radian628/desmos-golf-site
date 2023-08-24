@@ -110,7 +110,7 @@ export async function runTestCase(
 
     if (item.type !== "expression") continue;
     if (!item.latex) continue;
-    let stuffAfterEq = item.latex.match(stuffAfterEqRegex);
+    const stuffAfterEq = item.latex.match(stuffAfterEqRegex);
     if (!stuffAfterEq) continue;
 
     console.log(test, inputIndex);
@@ -120,7 +120,7 @@ export async function runTestCase(
       value: test.input[inputIndex],
     });
 
-    let newLatex =
+    const newLatex =
       item.latex.replace(stuffAfterEqRegex, "") +
       "=" +
       serializeDesmosData(test.input[inputIndex]);
@@ -143,7 +143,7 @@ export async function runTestCase(
         ? test.expectedOutput.data.length
         : test.expectedOutput.thresholds.length;
 
-    const outState = await iface.getState();
+    await iface.getState();
     state.expressions.list.reverse();
     let outputIndex = 0;
     for (const item of state.expressions.list) {
@@ -295,7 +295,10 @@ export async function executeTestCase(
     outputIfFailure.outputs = [];
 
     if (testCaseOutput.outputExpressions.length != expectedOutput.data.length) {
-      return { success: false, reason: `Not enough output expressions! Expected ${expectedOutput.data.length} output expressions; got ${testCaseOutput.outputExpressions.length}` };
+      return {
+        success: false,
+        reason: `Not enough output expressions! Expected ${expectedOutput.data.length} output expressions; got ${testCaseOutput.outputExpressions.length}`,
+      };
     } else {
       let failure = false;
       for (let i = 0; i < expectedOutput.data.length; i++) {
@@ -330,8 +333,7 @@ export async function executeChallenge(
   ifaces: ChallengeInterfaces,
   challenge: DesmosChallenge
 ): Promise<FailedTestCaseOutput[]> {
-  let testIndex = 0;
-  let testsFailed: FailedTestCaseOutput[] = [];
+  const testsFailed: FailedTestCaseOutput[] = [];
   for (const test of challenge.testCases) {
     const passed = await executeTestCase(ifaces, test);
     console.log("TEST", passed);
@@ -346,8 +348,6 @@ export async function executeChallenge(
         });
       }
     }
-
-    testIndex++;
   }
 
   return testsFailed;
