@@ -8,7 +8,7 @@ import {
 } from "@codemirror/language";
 import { Diagnostic, linter } from "@codemirror/lint";
 import TestCaseMakerTypeDefs from "./TestCaseMakerTypeDefs.d.ts?raw";
-import { oneDarkHighlightStyle } from "@codemirror/theme-one-dark";
+import { oneDark } from "@codemirror/theme-one-dark";
 import { colorScheme } from "..";
 import { createEffect } from "solid-js";
 
@@ -47,6 +47,9 @@ export function TestCasesInput(
             doc: props.code(),
             extensions: [
               themeConfigCompartment.of([]),
+              syntaxHighlighting(defaultHighlightStyle, {
+                fallback: true,
+              }),
               EditorView.lineWrapping,
               EditorState.readOnly.of(props.readonly ?? false),
               EditorView.theme({
@@ -118,18 +121,11 @@ export function TestCasesInput(
         });
 
         createEffect(() => {
-          const cs = colorScheme();
-
           view.dispatch({
-            effects: themeConfigCompartment.reconfigure([
-              syntaxHighlighting(
-                cs === "dark" ? oneDarkHighlightStyle : defaultHighlightStyle,
-                { fallback: true }
-              ),
-            ]),
+            effects: themeConfigCompartment.reconfigure(
+              colorScheme() === "dark" ? [oneDark] : []
+            ),
           });
-
-          //console.log(colorScheme(), "infinite loop!");
         });
       }}
     ></div>
