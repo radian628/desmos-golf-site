@@ -2,3 +2,4 @@ reference/*.png
 *.sqlite3
 secret.txt
 dist
+.env
