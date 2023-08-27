@@ -96,8 +96,12 @@ export function Link(props: {
       <a
         class="better-route-link"
         onClick={(e) => {
-          window.history.pushState(undefined, "", props.to());
-          e.preventDefault();
+          const openingInNewTab = e.ctrlKey || e.shiftKey || e.metaKey;
+
+          if (!openingInNewTab) {
+            window.history.pushState(undefined, "", props.to());
+            e.preventDefault();
+          }
         }}
         href={props.to()}
       >
