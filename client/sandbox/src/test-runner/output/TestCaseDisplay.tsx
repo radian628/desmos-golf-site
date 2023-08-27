@@ -108,7 +108,7 @@ export function NormalFailedTestCaseDisplay(props: {
       </Show>
       <Show when={props.case().outputs}>
         <h3>Expression Outputs</h3>
-        <table>
+        <table class="output-match-display-table">
           <thead>
             <tr>
               <th>Expected</th>
@@ -120,17 +120,19 @@ export function NormalFailedTestCaseDisplay(props: {
               {(out) => (
                 <tr>
                   <td>
+                    <span style={{ color: "var(--border-color)" }}>
+                      <StaticMath latex={() => out.name}></StaticMath>
+                    </span>
                     <StaticMath
-                      latex={() =>
-                        out.name + "=" + serializeDesmosData(out.reference)
-                      }
+                      latex={() => "=" + serializeDesmosData(out.reference)}
                     ></StaticMath>
                   </td>
                   <td>
+                    <span style={{ color: "var(--border-color)" }}>
+                      <StaticMath latex={() => out.name}></StaticMath>
+                    </span>
                     <StaticMath
-                      latex={() =>
-                        out.name + "=" + serializeDesmosData(out.test)
-                      }
+                      latex={() => "=" + serializeDesmosData(out.test)}
                     ></StaticMath>
                   </td>
                 </tr>

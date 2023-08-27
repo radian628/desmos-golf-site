@@ -155,9 +155,20 @@ export async function runTestCase(
       const expressionValue = await iface.getExpressionValue(item.id);
       if (!expressionValue) continue;
 
+      let name = item.latex.replace(stuffAfterEqRegex, "");
+      if (
+        // show full latex as name if opening and closing brackets are unmatched
+        name.match(/\{/g)?.length !== name.match(/\}/g)?.length ||
+        name.match(/\[/g)?.length !== name.match(/\]/g)?.length ||
+        name.match(/\(/g)?.length !== name.match(/\)/g)?.length ||
+        // unmatched abs values
+        (name.match(/\|/g)?.length ?? 0) % 2 !== 0
+      )
+        name = item.latex;
+
       tco.outputExpressions.push({
         value: expressionValue,
-        name: item.latex.replace(stuffAfterEqRegex, ""),
+        name,
       });
       outputIndex++;
     }
