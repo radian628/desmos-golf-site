@@ -33,7 +33,6 @@ export default function MainPage() {
     untrack(async () => {
       challenges.reload();
       await challenges.loadN(challenges.challengeIDList().length);
-      console.log(challenges.challengeList(), challenges.challengeIDList());
     });
   });
 

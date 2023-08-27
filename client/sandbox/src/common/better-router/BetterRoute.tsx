@@ -21,7 +21,6 @@ export function checkIfRouteMatches(
   pathname: string
 ) {
   const pathSplit = pathname.split("/").slice(base);
-  console.log(pathMatcher, pathSplit);
   if (pathSplit[pathSplit.length - 1] === "") pathSplit.pop();
   if (pathSplit.length !== pathMatcher.length && !allowMore) return false;
   for (let i = 0; i < pathMatcher.length; i++) {
@@ -57,8 +56,6 @@ export function BetterRoute(props: {
   allowMore?: boolean;
 }) {
   const routeBaseAmount = useContext(RouteBaseContext);
-
-  console.log("route base amount", routeBaseAmount());
 
   return (
     <Show

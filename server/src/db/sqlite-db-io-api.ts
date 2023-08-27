@@ -52,8 +52,6 @@ export default async function sqlite3DatabaseAPI(): Promise<DatabaseIOAPI> {
 
   await AppDataSource.initialize();
 
-  console.log(await AppDataSource.getRepository(Challenge).findAndCount());
-
   return {
     async getChallengeData(cid) {
       return (
@@ -96,7 +94,6 @@ export default async function sqlite3DatabaseAPI(): Promise<DatabaseIOAPI> {
     },
 
     async createNewChallenge(info) {
-      console.log("createnewchallenge", info);
       const challenge = await AppDataSource.getRepository(Challenge).insert(
         info
       );

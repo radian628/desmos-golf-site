@@ -37,9 +37,11 @@ app.use(
   })
 );
 
+// eslint-disable-next-line no-console
+export const debugPrint = (...args: unknown[]) => console.log(args);
+
 app.listen(port, hostname, () => {
-  console.log(
+  debugPrint(
     `Running Desmos Golf Server on port ${port}, hostname ${hostname}`
   );
-  console.log("cwd", process.cwd());
 });

@@ -1,4 +1,5 @@
 import puppeteer from "puppeteer";
+import { debugPrint } from "../server.js";
 
 export type ValidationAPI = {
   getGraphStateLength: (graphLink: string) => Promise<number | undefined>;
@@ -35,7 +36,7 @@ export async function puppeteerValidationAPI(
           (await (window as any).verifyGraph(graphLink)).length === 0,
         opts.graphLink
       );
-      console.log("Validation result: ", result);
+      debugPrint("Validation result: ", result);
       page.close();
       return result === true;
     },

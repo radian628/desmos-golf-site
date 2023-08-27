@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import * as esbuild from "esbuild";
 import { lessLoader } from "esbuild-plugin-less";
 import { solidPlugin } from "esbuild-plugin-solid";
