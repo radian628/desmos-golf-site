@@ -64,8 +64,12 @@ type MapTypeToData = {
       <p>
         The function <code>test</code> runs tests on a graph based on a
         reference graph. That is, output from all tests from this graph will be
-        compared against output from the reference. Its argument is structured
-        as follows:
+        compared against output from the reference.{" "}
+        <em>
+          At least one of <code>screenshot</code> or <code>outputs</code> is
+          required.
+        </em>{" "}
+        Its argument is structured as follows:
       </p>
       <TestCasesInput
         code={() => `function test<

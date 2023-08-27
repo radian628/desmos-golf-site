@@ -97,8 +97,6 @@ export async function waitForOnEvaluatorChangesEvents(calc: Calc, n: number) {
 export function calcObjectToChallengeInterface(calc: Calc): ChallengeInterface {
   let time = 0;
 
-  console.log(calc);
-
   const originalGraphState = calc.getState();
 
   async function uriToBitmap(uri: string): Promise<number[]> {
@@ -153,7 +151,6 @@ export function calcObjectToChallengeInterface(calc: Calc): ChallengeInterface {
 
     async setExpressionLatex(id: string, latex: string) {
       calc.setExpression({ id, latex });
-      console.log("setexprlatex");
       await waitForOnEvaluatorChangesEvents(calc, 1);
     },
 
@@ -185,7 +182,6 @@ export function calcObjectToChallengeInterface(calc: Calc): ChallengeInterface {
 
     async resetGraph() {
       calc.setState(originalGraphState);
-      console.log("resetgraph");
       await waitForOnEvaluatorChangesEvents(calc, 1);
     },
 

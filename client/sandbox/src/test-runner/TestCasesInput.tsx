@@ -20,7 +20,6 @@ let tsMorphBootstrapModule: typeof import("@ts-morph/bootstrap");
 export async function getTsMorphBootstrap() {
   if (!tsMorphBootstrapModule)
     tsMorphBootstrapModule = (await import("@ts-morph/bootstrap")).default;
-  console.log(tsMorphBootstrapModule);
   return tsMorphBootstrapModule;
 }
 

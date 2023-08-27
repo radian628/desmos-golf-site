@@ -29,7 +29,6 @@ function getDesmos() {
   return new Promise<typeof Desmos>((resolve) => {
     const interval = setInterval(() => {
       if (window.Desmos) {
-        console.log("desmos is loaded");
         clearInterval(interval);
         resolve(window.Desmos);
       }
@@ -44,8 +43,6 @@ export function TestRunner(props: {
   setTestOutput: (o: FailedTestCaseOutput[]) => void;
   setHasRunTests: (t: boolean) => void;
 }) {
-  console.log("current state of desmso", window.Desmos);
-
   const [testCalc, setTestCalc] = createSignal<Desmos.Calculator>();
 
   const [referenceGraphs, setReferenceGraphs] = createSignal<
@@ -91,8 +88,6 @@ export function TestRunner(props: {
       </div>
     ),
     runTestSuite: async () => {
-      console.log("test suite", props.testSuite());
-
       await poll(() => ready);
 
       // remove all reference graphs
