@@ -6,7 +6,13 @@ The source code for the Desmos Code Golf Site (both server and client).
 
 If you just want to get this thing running, run the init script with `node init.mjs` in the root directory of this project.
 
-## Server Setup
+## Dev Setup
+
+If you want to get this running _and_ also have it automatically watch and rebuild, run `node init.mjs dev`.
+
+## But what if I want to run only the server or only the client for some reason?
+
+### Server Setup
 
 Before running the server, you have to set up `server/.env` with an admin passcode that gives you write access to the challenge list so you can easily create new challenges. It should go without saying, but don't reuse an existing password for this, because it's both stored and transmitted in plaintext (though it's theoretically secure over HTTPS).
 
@@ -22,7 +28,7 @@ npm run dev
 npm start
 ```
 
-## Client Setup
+### Client Setup
 
 ```sh
 cd client/sandbox
