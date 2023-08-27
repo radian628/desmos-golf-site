@@ -13,7 +13,9 @@ export function Sandbox() {
     createSignal<ChallengeDataWithoutID>({
       name: "New Challenge",
       desc: "Put a description of the challenge here.",
-      testSuite: "// write some code that generates a test suite here",
+      testSuite:
+        localStorage.getItem("golfsite-sandbox-graph-link") ??
+        "// write some code that generates a test suite here",
     });
 
   const [testGraphLink, setTestGraphLink] = createSignal<string>("");
@@ -54,12 +56,13 @@ export function Sandbox() {
         testGraphLink={testGraphLink}
         setTestGraphLink={setTestGraphLink}
         testCasesSpec={() => challengeData().testSuite}
-        setTestCasesSpec={(v) =>
+        setTestCasesSpec={(v) => {
+          localStorage.setItem("golfsite-sandbox-graph-link", v);
           setChallengeData({
             ...challengeData(),
             testSuite: v,
-          })
-        }
+          });
+        }}
         setTestOutput={() => {}}
       ></TestRunnerPage>
     </>
