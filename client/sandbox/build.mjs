@@ -81,6 +81,8 @@ let ctx = await esbuild.context({
   format: "esm",
   publicPath: "/",
   minify: !isDev,
+  metafile: isDev,
+  splitting: true,
 });
 
 if (isDev) {
