@@ -8,11 +8,11 @@ Before running the server, you have to set up `server/.env` with an admin passco
 
 For example, to get the password "admin", run `echo 'admin_pass=admin' > server/.env`. Of course, you can also edit the file directly. There's other options too. The default settings are `hostname=localhost` and `port=80`, but you can change it by e.g. adding a line `port=8080`.
 
-## Simple Setup
+## Build & Run
 
 If you just want to get this thing running, run the init script with `node init.mjs` in the root directory of this project.
 
-## Dev Setup
+## Build & Run for Development
 
 If you want to get this running _and_ also have it automatically watch and rebuild, run `node init.mjs dev`.
 
