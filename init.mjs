@@ -25,6 +25,8 @@ if (isDev) {
     npx,
     [
       "concurrently",
+      "--names",
+      "ClientBuild,ServerBuild,Server",
       "npm --prefix client/sandbox run dev",
       "npm --prefix server run dev",
       "npm --prefix server run start",
