@@ -1,15 +1,22 @@
-import * as z from "zod";
-import * as fs from "node:fs/promises";
-
-const serverConfigParser = z.object({
-  hostname: z.string(),
-  port: z.number(),
-});
+import { config } from "dotenv";
 
 export async function getServerConfig() {
-  const config = (await fs.readFile("server-config.json")).toString();
+  const { error, parsed: cfg } = config();
+  if (error) throw error;
 
-  const parsedConfig = serverConfigParser.parse(JSON.parse(config));
+  const portString = cfg?.port ?? "80";
+  if (!/^\d{1,5}$/.test(portString))
+    throw new Error(`Port '${portString}' is not a valid port.`);
+  const port = parseInt(portString);
 
-  return parsedConfig;
+  const hostname = cfg?.hostname ?? "localhost";
+  if (!hostname) throw new Error(`Hostname cannot be empty.`);
+
+  const adminPass = cfg?.admin_pass;
+  if (!adminPass)
+    throw new Error(
+      "Admin passcode missing. Add `admin_pass=[passcode here]` to the file server/.env."
+    );
+
+  return { port, hostname, adminPass };
 }
