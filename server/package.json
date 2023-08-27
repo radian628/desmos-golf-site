@@ -16,7 +16,7 @@
   "scripts": {
     "build": "npx tsc --project ./",
     "dev": "npx tsc --watch --project ./",
-    "start": "node dist/server/src/server.js",
-    "make-reference": "npm run build && node dist/server/src/make-reference.js"
+    "start": "node dist/server.js",
+    "make-reference": "npm run build && node dist/make-reference.js"
   }
 }
