@@ -8,7 +8,7 @@ import { GraphState } from "@desmodder/graph-state";
 import {
   Calc,
   calcObjectToChallengeInterface,
-  waitForOnEvaluatorChangesEvents,
+  waitForSync,
 } from "../../../../shared/challenge-interface";
 import "./TestRunner.css";
 import { poll } from "../common/utils";
@@ -123,7 +123,7 @@ export function TestRunner(props: {
 
             const calc = (await getDesmos()).GraphingCalculator(inner, {});
             calc.setState(state.state);
-            await waitForOnEvaluatorChangesEvents(calc as Calc, 1);
+            await waitForSync(calc as Calc);
 
             setReferenceGraphs(
               new Map([
