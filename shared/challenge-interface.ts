@@ -69,6 +69,9 @@ export type Calc = {
       register: (handler: (evt: DesmosEvent) => void) => string;
       unregister: (handle: string) => void;
     };
+    evaluator: {
+      notifyWhenSynced: (cb: () => void) => void;
+    };
     dispatch: (evt: DesmosEvent) => void;
     getAllItemModels: () => ItemModel[];
     getItemModel: (id: string) => ItemModel | undefined;
@@ -77,20 +80,9 @@ export type Calc = {
   setExpression: (expr: { id: string; latex: string }) => void;
 } & Desmos.Calculator;
 
-export async function waitForOnEvaluatorChangesEvents(calc: Calc, n: number) {
-  let evaluatorChangesCounter = 0;
-  const dispatcher = calc.controller.dispatcher.register((evt) => {
-    if (evt.type === "on-evaluator-changes") evaluatorChangesCounter++;
-  });
-
+export async function waitForSync(calc: Calc) {
   return new Promise<void>((resolve) => {
-    const interval = setInterval(() => {
-      if (evaluatorChangesCounter >= n) {
-        calc.controller.dispatcher.unregister(dispatcher);
-        clearInterval(interval);
-        resolve();
-      }
-    });
+    calc.controller.evaluator.notifyWhenSynced(() => resolve());
   });
 }
 
@@ -151,7 +143,7 @@ export function calcObjectToChallengeInterface(calc: Calc): ChallengeInterface {
 
     async setExpressionLatex(id: string, latex: string) {
       calc.setExpression({ id, latex });
-      await waitForOnEvaluatorChangesEvents(calc, 1);
+      await waitForSync(calc);
     },
 
     async getScreenshotBitmap(opts) {
@@ -182,7 +174,7 @@ export function calcObjectToChallengeInterface(calc: Calc): ChallengeInterface {
 
     async resetGraph() {
       calc.setState(originalGraphState);
-      await waitForOnEvaluatorChangesEvents(calc, 1);
+      await waitForSync(calc);
     },
 
     async getExpressionValue(id) {
